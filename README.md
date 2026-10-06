@@ -1,410 +1,296 @@
 # MURMUR
 
-## Project Overview
+> Native iOS voice notes application focused on real-time audio recording, waveform visualization, and audio lifecycle management.
 
-MURMUR is a mobile voice-notes application focused on real-time audio recording and visualization.
+## Overview
 
-The main objective of the project is not simply to build another voice recorder, but to explore audio processing, real-time UI rendering, local storage and mobile application lifecycle management.
+MURMUR is a native iOS voice-notes application built to explore audio recording and real-time audio visualization using Apple's native frameworks.
 
-The application should allow the user to record a voice note while seeing the waveform being drawn in real time.
+The goal of the project is not simply to build another voice recorder. MURMUR is designed as a technically focused project to understand how audio capture, audio sessions, buffers, real-time rendering, local persistence, and the iOS application lifecycle work together.
 
-The project is intended to be a technically focused mobile application suitable for a software engineering portfolio.
+The application will allow users to record voice notes while seeing a waveform generated in real time, save recordings locally, and play them back later.
 
----
+## Goals
 
-## Main Goal
+The project is designed to explore and demonstrate knowledge of:
 
-Build a polished mobile voice recorder capable of:
+- Swift
+- SwiftUI
+- AVFoundation
+- AVAudioSession
+- AVAudioEngine
+- Audio buffers
+- Audio metering
+- Real-time waveform rendering
+- Swift Concurrency
+- SwiftData
+- iOS application lifecycle
+- Audio interruptions and route changes
+- Native iOS architecture
+- Testing
 
-- Recording audio.
-- Displaying a live waveform while recording.
-- Showing recording duration.
-- Showing basic audio metering.
-- Saving recordings locally.
-- Listing previous recordings.
-- Playing recordings.
-- Deleting recordings.
-- Handling microphone permissions correctly.
-- Recovering gracefully from interruptions.
+## Tech Stack
 
-The application should remain relatively small in functionality but technically deep.
+- **Language:** Swift
+- **UI:** SwiftUI
+- **Audio:** AVFoundation
+- **Audio Processing:** Accelerate where appropriate
+- **Persistence:** SwiftData
+- **Concurrency:** Swift Concurrency
+- **Testing:** Swift Testing / XCTest
+- **Dependency Management:** Swift Package Manager
 
----
+The project prioritizes native Apple frameworks and avoids third-party dependencies unless they provide a clear technical benefit.
 
-# Core Concept
+## Core Architecture
 
-The main screen should behave similarly to a professional field recorder.
+The main audio pipeline will follow a structure similar to:
 
-During recording, the user should see:
-
-- Live waveform.
-- Recording timer.
-- Audio level / peak information.
-- Record / stop control.
-- Optional marker button.
-- Recording state.
-
-Example:
-
-REC ●
-
-02:47
-
-████████████████
-live waveform
-
-Peak: -4.2 dB
-
-[Discard] [Stop] [Marker]
-
-Below the recorder, recent recordings should be displayed.
-
----
-
-# Technical Objectives
-
-This project should teach and demonstrate:
-
-- Mobile microphone permissions.
-- Audio recording.
-- Audio session management.
-- Real-time audio metering.
-- Real-time graphical rendering.
-- React Native performance.
-- File management.
-- Application lifecycle management.
-- Local persistence.
-- State management.
-- Audio playback.
-- Handling interruptions such as:
-  - phone calls
-  - app going into background
-  - audio route changes
-  - permission changes
-
----
-
-# Technology Stack
-
-## Mobile
-
-- React Native
-- Expo
-- TypeScript
-
-## Audio
-
-- expo-audio
-
-## Graphics
-
-- React Native Skia
-
-The waveform should be rendered using Skia rather than building hundreds of React components.
-
-## State Management
-
-- Zustand
-
-## Local Persistence
-
-Possible options:
-
-- MMKV
-- SQLite
-
-The final choice should be made during the architecture phase.
-
-## Styling
-
-- NativeWind
-
----
-
-# Functional Requirements
-
-## Recording
-
-The user must be able to:
-
-- Start a recording.
-- Pause a recording if supported by the chosen architecture.
-- Stop a recording.
-- Cancel/discard a recording.
-- See recording duration.
-- See live audio levels.
-
----
-
-## Live Waveform
-
-While recording:
-
-- Audio amplitude should be sampled periodically.
-- Samples should be stored in a small rolling buffer.
-- The waveform should update smoothly.
-- Rendering should avoid unnecessary React re-renders.
-- The UI should remain responsive.
-
-Target:
-
-60 FPS whenever possible.
-
----
-
-## Recording Library
-
-Saved recordings should contain:
-
-- ID.
-- Filename.
-- Creation date.
-- Duration.
-- File path.
-- Optional title.
-- Optional waveform preview.
-- Optional markers.
-
-Example:
-
-VoiceNote {
-    id
-    title
-    fileUri
-    duration
-    createdAt
-    waveformData
-}
-
----
-
-## Playback
-
-The user should be able to:
-
-- Play a recording.
-- Pause playback.
-- Seek through the recording.
-- See playback progress.
-- Delete the recording.
-
----
-
-# Optional Feature: Markers
-
-During recording, the user may press a marker button.
-
-Example:
-
-00:32 — Marker
-01:14 — Marker
-02:05 — Marker
-
-Markers should allow the user to quickly return to important moments.
-
-This feature should only be implemented after the core recording functionality is stable.
-
----
-
-# Architecture
-
-Suggested structure:
-
-src/
-
-components/
-    Waveform/
-    RecorderControls/
-    RecordingCard/
-
-features/
-    recorder/
-    recordings/
-    player/
-
-services/
-    audio/
-    storage/
-
-store/
-    recorderStore.ts
-    recordingsStore.ts
-
-hooks/
-    useRecorder.ts
-    useAudioMeter.ts
-
-types/
-
-utils/
-
----
-
-# Important Technical Challenge
-
-The main technical challenge is:
-
-REAL-TIME AUDIO → UI
-
-Possible flow:
-
+```text
 Microphone
     ↓
-Audio Metering
+AVAudioSession
+    ↓
+AVAudioEngine
+    ↓
+Audio Buffers
     ↓
 Amplitude Samples
     ↓
-Rolling Buffer
+Rolling Waveform Buffer
     ↓
-Skia Canvas
-    ↓
-Live Waveform
+SwiftUI
+```
 
-The implementation should avoid updating the entire React tree for every audio sample.
+One of the main engineering challenges is updating the waveform smoothly without causing unnecessary updates across the entire SwiftUI view hierarchy.
 
----
+## MVP
 
-# MVP
+The first production-ready version should support:
 
-The first production-ready version should include only:
+- Microphone permissions
+- Start recording
+- Stop recording
+- Discard recording
+- Recording duration
+- Real-time audio level
+- Live waveform visualization
+- Local audio file storage
+- Recording metadata persistence
+- Recording library
+- Audio playback
+- Pause playback
+- Seek
+- Delete recording
 
-- Microphone permission.
-- Start recording.
-- Stop recording.
-- Live waveform.
-- Recording duration.
-- Save recording locally.
-- Recording list.
-- Playback.
-- Delete recording.
+## Data Model
 
-Everything else is secondary.
+Initial recording model:
 
----
+```text
+Recording
+├── id
+├── title
+├── fileURL
+├── duration
+├── createdAt
+└── waveformData
+```
 
-# Features Outside the Initial MVP
+The final model may evolve during the architecture and persistence phases.
 
-Do NOT implement initially:
+## Key Engineering Challenges
 
-- User accounts.
-- Cloud synchronization.
-- Social features.
-- AI transcription.
-- Sharing system.
-- Collaborative recordings.
-- Backend.
-- Complex folders.
-- Advanced audio editing.
+### Real-Time Waveform
 
-These features may be considered only after the core application is complete.
+Audio amplitude samples must be collected and transformed into data suitable for rendering.
 
----
+The waveform should:
 
-# Development Philosophy
+- Update smoothly
+- Use a bounded rolling buffer
+- Avoid excessive SwiftUI updates
+- Remain responsive during long recordings
+- Avoid unnecessary memory allocation
 
-The project should prioritize:
+### Audio Session Management
 
-1. Correct audio handling.
-2. Smooth waveform rendering.
-3. Clean architecture.
-4. Mobile performance.
-5. Good UX.
-6. Testing.
-7. Documentation.
+The application should correctly handle:
 
-Avoid unnecessary features.
+- Incoming calls
+- Audio interruptions
+- Headphone connection/disconnection
+- Audio route changes
+- App backgrounding
+- Permission changes
+- Recording failures
 
-The objective is technical depth, not feature count.
+### Persistence
 
----
+Audio files and recording metadata must remain synchronized.
 
-# Development Phases
+Deleting a recording should correctly remove both its metadata and associated audio file.
 
-## Phase 1 — Product Definition
+## Project Structure
+
+The exact structure will be defined during the architecture phase, but the project should separate concerns such as:
+
+```text
+MURMUR/
+├── App/
+├── Features/
+│   ├── Recorder/
+│   ├── Recordings/
+│   └── Player/
+├── Audio/
+├── Persistence/
+├── Models/
+├── Components/
+├── Utilities/
+└── Tests/
+```
+
+## Development Roadmap
+
+### Phase 1 — Product Definition
 
 Define:
 
-- User problem.
-- User flow.
-- MVP.
-- Screens.
-- UX.
+- User problem
+- Product scope
+- MVP
+- Main screens
+- User flows
 
-## Phase 2 — Architecture
+### Phase 2 — Architecture
 
 Define:
 
-- Audio architecture.
-- State management.
-- Local persistence.
-- File structure.
+- Application architecture
+- Audio architecture
+- Dependency boundaries
+- State ownership
 
-## Phase 3 — Recording Engine
+### Phase 3 — Persistence
 
-Implement:
+Define:
 
-- Permissions.
-- Recording.
-- Stop.
-- Save.
+- Recording model
+- SwiftData model
+- Audio file management strategy
 
-## Phase 4 — Live Waveform
-
-Implement:
-
-- Audio metering.
-- Sampling.
-- Waveform buffer.
-- Skia rendering.
-
-## Phase 5 — Recording Library
+### Phase 4 — Recording Engine
 
 Implement:
 
-- Persistence.
-- Recording list.
-- Metadata.
+- Permissions
+- AVAudioSession
+- Audio recording
+- Start/stop lifecycle
 
-## Phase 6 — Playback
+### Phase 5 — Live Waveform
 
 Implement:
 
-- Player.
-- Seek.
-- Progress.
+- Audio metering
+- Buffer processing
+- Amplitude sampling
+- Waveform rendering
 
-## Phase 7 — Reliability
+### Phase 6 — Recording Library
+
+Implement:
+
+- Recording persistence
+- Recording list
+- Metadata management
+- Deletion
+
+### Phase 7 — Audio Player
+
+Implement:
+
+- Playback
+- Pause
+- Seek
+- Progress tracking
+
+### Phase 8 — Reliability
 
 Handle:
 
-- Background state.
-- Audio interruptions.
-- App crashes.
-- Permission errors.
+- Interruptions
+- Route changes
+- Background state
+- Permission changes
+- Failure recovery
 
-## Phase 8 — Testing and Documentation
+### Phase 9 — Testing
 
 Add:
 
-- Tests.
-- Architecture documentation.
-- README.
-- Demo video.
-- Screenshots.
+- Unit tests
+- Audio logic tests
+- Persistence tests
 
----
+### Phase 10 — Optimization
 
-# Portfolio Value
+Analyze:
 
-This project should demonstrate knowledge of:
+- CPU usage
+- Memory usage
+- Rendering performance
+- Long recording sessions
 
-- React Native.
-- Mobile APIs.
-- Audio processing.
-- Real-time rendering.
-- Performance optimization.
-- Local persistence.
-- State management.
-- Mobile lifecycle management.
+### Phase 11 — Documentation
 
-The project should be presented as an audio engineering / mobile systems project rather than simply a voice recorder.
+Document:
+
+- Architecture
+- Audio pipeline
+- Technical decisions
+- Trade-offs
+
+### Phase 12 — Release
+
+Prepare:
+
+- Screenshots
+- Demo
+- Release notes
+- Final documentation
+
+## Out of Scope
+
+The initial version will not include:
+
+- User accounts
+- Backend
+- Cloud synchronization
+- Social features
+- AI transcription
+- Advanced audio editing
+- Collaborative recordings
+- Complex folder systems
+
+The project prioritizes technical depth over feature count.
+
+## Project Philosophy
+
+MURMUR should remain relatively small in functionality while exploring audio engineering in depth.
+
+The objective is not:
+
+> Build a voice recorder.
+
+The objective is:
+
+> Build a native iOS audio application with real-time processing, efficient rendering, reliable lifecycle management, and clean architecture.
+
+## Status
+
+🚧 **In development**
+
+Current stage:
+
+**Phase 1 — Product Definition**

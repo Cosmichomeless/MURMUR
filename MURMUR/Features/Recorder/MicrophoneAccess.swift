@@ -20,6 +20,11 @@ final class MicrophoneAccess {
         permission = session.microphonePermission
     }
 
+    /// Gives the audio session back once nothing is capturing any more.
+    func releaseSession() {
+        session.deactivate()
+    }
+
     /// Resolves the permission (showing the system prompt if needed) and activates the session.
     ///
     /// Returns `true` only when it is safe to start capturing. On denial or failure nothing is

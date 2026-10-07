@@ -6,6 +6,7 @@ struct MURMURApp: App {
     private let container: ModelContainer
     @State private var microphoneAccess: MicrophoneAccess
     @State private var recorder: RecorderViewModel
+    private let repository: RecordingRepository
 
     init() {
         let fileStore = RecordingFileStore.default
@@ -24,6 +25,7 @@ struct MURMURApp: App {
         _ = try? RecordingReconciler(context: context, fileStore: fileStore).run()
 
         let repository = RecordingRepository(context: context, fileStore: fileStore)
+        self.repository = repository
         let access = MicrophoneAccess(session: AudioSessionManager())
         let audioRecorder = AudioRecorder(
             makeTemporaryURL: { fileStore.makeTemporaryURL() },
@@ -45,7 +47,7 @@ struct MURMURApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(microphoneAccess: microphoneAccess, recorder: recorder)
+            RootView(microphoneAccess: microphoneAccess, recorder: recorder, repository: repository)
         }
         .modelContainer(container)
     }

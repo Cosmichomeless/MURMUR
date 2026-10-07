@@ -100,3 +100,73 @@ struct RecordingRepositoryTests {
         #expect(store.fileStore.exists(fileName: restored[0].fileName))
     }
 }
+
+@MainActor
+struct RecordingDeletionTests {
+    private func makeEnvironment() throws -> (TestStore, RecordingRepository, ModelContext, ModelContainer) {
+        let store = TestStore()
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let repository = RecordingRepository(context: container.mainContext, fileStore: store.fileStore)
+        return (store, repository, container.mainContext, container)
+    }
+
+    @Test func deleteRemovesMetadataAndFile() throws {
+        let (store, repository, context, container) = try makeEnvironment()
+        defer { store.cleanUp(); withExtendedLifetime(container) {} }
+        let recording = try repository.save(temporaryURL: store.writeTemporaryFile(), duration: 3, waveform: [])
+        let fileName = recording.fileName
+
+        let outcome = try repository.delete(recording)
+
+        #expect(outcome == .deleted)
+        #expect(try context.fetch(FetchDescriptor<Recording>()).isEmpty)
+        #expect(!store.fileStore.exists(fileName: fileName))
+    }
+
+    @Test func deleteOnlyAffectsTheChosenRecording() throws {
+        let (store, repository, context, container) = try makeEnvironment()
+        defer { store.cleanUp(); withExtendedLifetime(container) {} }
+        let keep = try repository.save(temporaryURL: store.writeTemporaryFile(), duration: 1, waveform: [], title: "keep")
+        let drop = try repository.save(temporaryURL: store.writeTemporaryFile(), duration: 1, waveform: [], title: "drop")
+
+        try repository.delete(drop)
+
+        let remaining = try context.fetch(FetchDescriptor<Recording>())
+        #expect(remaining.map(\.title) == ["keep"])
+        #expect(store.fileStore.exists(fileName: keep.fileName))
+        #expect(try store.fileStore.storedFileNames() == [keep.fileName])
+    }
+
+    @Test func aFileAlreadyMissingStillDeletesTheMetadata() throws {
+        let (store, repository, context, container) = try makeEnvironment()
+        defer { store.cleanUp(); withExtendedLifetime(container) {} }
+        let recording = try repository.save(temporaryURL: store.writeTemporaryFile(), duration: 1, waveform: [])
+        try FileManager.default.removeItem(at: store.fileStore.fileURL(for: recording.fileName))
+
+        let outcome = try repository.delete(recording)
+
+        #expect(outcome == .deleted)
+        #expect(try context.fetch(FetchDescriptor<Recording>()).isEmpty)
+    }
+
+    @Test func aFileThatCannotBeRemovedIsReportedAndSweptByReconciliation() throws {
+        let (store, repository, context, container) = try makeEnvironment()
+        defer { store.cleanUp(); withExtendedLifetime(container) {} }
+        let recording = try repository.save(temporaryURL: store.writeTemporaryFile(), duration: 1, waveform: [])
+        let fileName = recording.fileName
+        let directory = store.fileStore.fileURL(for: fileName).deletingLastPathComponent()
+
+        // A read-only folder makes unlinking the file fail.
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: directory.path)
+        let outcome = try repository.delete(recording)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: directory.path)
+
+        #expect(outcome == .fileLeftBehind(fileName: fileName))
+        #expect(try context.fetch(FetchDescriptor<Recording>()).isEmpty) // not listed any more
+        #expect(store.fileStore.exists(fileName: fileName)) // orphan file, for now
+
+        let report = try RecordingReconciler(context: context, fileStore: store.fileStore).run()
+        #expect(report.removedOrphanFiles == 1)
+        #expect(!store.fileStore.exists(fileName: fileName))
+    }
+}

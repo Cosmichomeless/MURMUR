@@ -5,9 +5,12 @@ import SwiftUI
 struct LibraryView: View {
     let microphoneAccess: MicrophoneAccess
     let recorder: RecorderViewModel
+    let repository: RecordingRepository
 
     @Query(Recording.newestFirst()) private var recordings: [Recording]
     @State private var isRecording = false
+    @State private var pendingDeletion: Recording?
+    @State private var deletionMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -21,6 +24,11 @@ struct LibraryView: View {
                 } else {
                     List(recordings) { recording in
                         RecordingRow(recording: recording)
+                            .swipeActions(edge: .trailing) {
+                                Button("Delete", systemImage: "trash", role: .destructive) {
+                                    pendingDeletion = recording
+                                }
+                            }
                     }
                 }
             }
@@ -34,9 +42,41 @@ struct LibraryView: View {
                     }
                 }
             }
+            .confirmationDialog(
+                "Delete this recording?",
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { if !$0 { pendingDeletion = nil } }
+                ),
+                titleVisibility: .visible,
+                presenting: pendingDeletion
+            ) { recording in
+                Button("Delete \"\(recording.title)\"", role: .destructive) { delete(recording) }
+            } message: { _ in
+                Text("The audio file will be removed from this device. This can't be undone.")
+            }
+            .alert("Couldn't delete", isPresented: Binding(
+                get: { deletionMessage != nil },
+                set: { if !$0 { deletionMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(deletionMessage ?? "")
+            }
             .sheet(isPresented: $isRecording) {
                 RecorderSheet(model: recorder, access: microphoneAccess)
             }
+        }
+    }
+}
+
+extension LibraryView {
+    private func delete(_ recording: Recording) {
+        do {
+            // A leftover file (`.fileLeftBehind`) is invisible to the user and swept at next launch.
+            try repository.delete(recording)
+        } catch {
+            deletionMessage = error.localizedDescription
         }
     }
 }

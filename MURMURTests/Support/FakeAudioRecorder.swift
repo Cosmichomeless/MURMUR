@@ -18,7 +18,10 @@ final class FakeAudioRecorder: AudioRecording {
     func start() throws -> AsyncThrowingStream<RecorderSample, Error> {
         if let startError { throw startError }
         startCount += 1
-        let (stream, continuation) = AsyncThrowingStream<RecorderSample, Error>.makeStream()
+        // Same policy as the real recorder: a slow consumer drops old samples instead of growing.
+        let (stream, continuation) = AsyncThrowingStream<RecorderSample, Error>.makeStream(
+            bufferingPolicy: .bufferingNewest(32)
+        )
         self.continuation = continuation
         return stream
     }

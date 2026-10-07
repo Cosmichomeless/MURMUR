@@ -15,6 +15,10 @@ struct RecorderView: View {
                     .accessibilityLabel("Elapsed time")
                     .accessibilityValue(Self.format(model.elapsed))
 
+                WaveformView(waveform: model.waveform)
+                    .frame(height: 96)
+                    .opacity(model.state == .paused ? 0.4 : 1)
+
                 controls
 
                 if case .failed(let message) = model.state {

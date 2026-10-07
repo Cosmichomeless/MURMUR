@@ -9,6 +9,8 @@ import os
 final class RecordingTapProcessor: @unchecked Sendable {
     /// Meter window: the peak of the buffers inside it becomes one sample (~20 Hz).
     static let sampleWindow: TimeInterval = 0.05
+    /// Resolution of the summary saved with a recording (it holds up to twice this many bins).
+    static let waveformBinCount = 100
 
     private struct State {
         var file: AVAudioFile?
@@ -17,6 +19,7 @@ final class RecordingTapProcessor: @unchecked Sendable {
         var windowFrames: AVAudioFrameCount = 0
         var windowPeakRMS: Float = 0
         var failure: (any Error)?
+        var waveform = WaveformDownsampler(binCount: RecordingTapProcessor.waveformBinCount)
     }
 
     let sampleRate: Double
@@ -56,6 +59,7 @@ final class RecordingTapProcessor: @unchecked Sendable {
             // Carry the remainder over so the average rate stays ~20 Hz whatever the buffer size.
             state.windowFrames -= windowFrames
             state.windowPeakRMS = 0
+            state.waveform.append(sample.level)
             return .success(sample)
         }
 
@@ -78,6 +82,11 @@ final class RecordingTapProcessor: @unchecked Sendable {
         }
         continuation.finish()
         return frames
+    }
+
+    /// Bounded summary of everything captured so far, for saving with the recording.
+    var waveform: [Float] {
+        lock.withLock { $0.waveform.result }
     }
 
     var framesWritten: AVAudioFramePosition {

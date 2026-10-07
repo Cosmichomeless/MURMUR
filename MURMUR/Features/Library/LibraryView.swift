@@ -6,6 +6,7 @@ struct LibraryView: View {
     let microphoneAccess: MicrophoneAccess
     let recorder: RecorderViewModel
     let repository: RecordingRepository
+    let player: PlayerViewModel
 
     @Query(Recording.newestFirst()) private var recordings: [Recording]
     @State private var isRecording = false
@@ -23,19 +24,30 @@ struct LibraryView: View {
                     )
                 } else {
                     List(recordings) { recording in
-                        RecordingRow(recording: recording)
-                            .swipeActions(edge: .trailing) {
-                                Button("Delete", systemImage: "trash", role: .destructive) {
-                                    pendingDeletion = recording
-                                }
+                        NavigationLink(value: recording) {
+                            RecordingRow(recording: recording)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                pendingDeletion = recording
                             }
+                        }
                     }
                 }
             }
             .navigationTitle("MURMUR")
+            .navigationDestination(for: Recording.self) { recording in
+                PlayerView(
+                    recording: recording,
+                    fileURL: recording.fileURL(in: repository.fileStore),
+                    model: player
+                )
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
+                        // Capture and playback must not overlap: they need different session categories.
+                        player.stop()
                         isRecording = true
                     } label: {
                         Label("Record", systemImage: "mic.fill")

@@ -70,6 +70,24 @@ struct MicrophoneAccessTests {
         #expect(access.permission == .granted)
     }
 
+    @Test func reactivateActivatesTheSessionAgain() throws {
+        let session = FakeAudioSession(permission: .granted)
+        let access = MicrophoneAccess(session: session)
+
+        try access.reactivate()
+
+        #expect(session.recordingActivations == 1)
+    }
+
+    @Test func reactivateFailsWhenThePermissionWasWithdrawn() {
+        let session = FakeAudioSession(permission: .granted)
+        let access = MicrophoneAccess(session: session)
+        session.microphonePermission = .denied
+
+        #expect(throws: AudioSessionError.microphoneAccessDenied) { try access.reactivate() }
+        #expect(session.recordingActivations == 0)
+    }
+
     @Test func systemPermissionMapsToAppPermission() {
         #expect(AudioSessionManager.permission(from: .granted) == .granted)
         #expect(AudioSessionManager.permission(from: .denied) == .denied)

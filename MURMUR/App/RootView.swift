@@ -17,6 +17,7 @@ struct RootView: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     microphoneAccess.refresh()
+                    recorder.permissionDidChange()
                 }
             }
     }

@@ -14,13 +14,22 @@ final class PlayerViewModel {
     @ObservationIgnored private let player: any AudioPlaying
     @ObservationIgnored private let session: any AudioSessionControlling
     @ObservationIgnored private var ticker: Task<Void, Never>?
+    @ObservationIgnored private var eventObserver: Task<Void, Never>?
+    /// Set when an interruption paused playback that was running, so it may pick up again afterwards.
+    @ObservationIgnored private var resumeAfterInterruption = false
 
     /// How often the position is read while playing. 20 Hz keeps the slider smooth and cheap.
     private static let tickInterval = Duration.milliseconds(50)
 
-    init(player: any AudioPlaying, session: any AudioSessionControlling) {
+    /// - Parameter events: Session interruptions and route changes. Without it the player ignores them.
+    init(
+        player: any AudioPlaying,
+        session: any AudioSessionControlling,
+        events: (any AudioSessionEventSource)? = nil
+    ) {
         self.player = player
         self.session = session
+        if let events { observe(events) }
     }
 
     var isPlaying: Bool { state == .playing }
@@ -69,6 +78,7 @@ final class PlayerViewModel {
 
     /// The session stays active so resuming is instant; it is released by `stop()` or at the end.
     func pause() {
+        resumeAfterInterruption = false
         player.pause()
         stopTicking()
         sync()
@@ -102,7 +112,38 @@ final class PlayerViewModel {
         currentTime = player.currentTime
     }
 
+    private func observe(_ events: any AudioSessionEventSource) {
+        let stream = events.subscribe()
+        eventObserver = Task { [weak self] in
+            for await event in stream {
+                guard let self else { return }
+                self.handle(event)
+            }
+        }
+    }
+
+    private func handle(_ event: AudioSessionEvent) {
+        switch event {
+        case .interruptionBegan:
+            guard isPlaying else { return }
+            pause()
+            resumeAfterInterruption = true // after pause(), which clears it
+        case .interruptionEnded(let shouldResume):
+            let wasInterrupted = resumeAfterInterruption
+            resumeAfterInterruption = false
+            if wasInterrupted, shouldResume, state == .paused { play() }
+        case .routeLost:
+            // Unplugged headphones: playing on through the speaker would be a surprise.
+            if isPlaying { pause() }
+        case .mediaServicesReset:
+            guard isLoaded else { return }
+            release()
+            errorMessage = "Audio services were reset. Open the recording again."
+        }
+    }
+
     private func release() {
+        resumeAfterInterruption = false
         stopTicking()
         let wasLoaded = isLoaded
         player.stop()

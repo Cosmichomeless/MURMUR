@@ -29,7 +29,8 @@ struct MURMURApp: App {
         self.repository = repository
         let session = AudioSessionManager()
         let access = MicrophoneAccess(session: session)
-        _player = State(initialValue: PlayerViewModel(player: AudioPlayer(), session: session))
+        let events = AudioSessionEvents()
+        _player = State(initialValue: PlayerViewModel(player: AudioPlayer(), session: session, events: events))
         let audioRecorder = AudioRecorder(
             makeTemporaryURL: { fileStore.makeTemporaryURL() },
             removeFile: { fileStore.removeTemporary(at: $0) }
@@ -38,6 +39,7 @@ struct MURMURApp: App {
         _recorder = State(initialValue: RecorderViewModel(
             access: access,
             recorder: audioRecorder,
+            events: events,
             save: { audio in
                 try repository.save(
                     temporaryURL: audio.fileURL,

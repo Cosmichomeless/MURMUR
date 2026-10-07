@@ -190,6 +190,107 @@ struct PlayerViewModelTests {
         #expect(session.deactivations == 0)
     }
 
+    // MARK: - Interruptions and route changes
+
+    private func makeModelWithEvents() -> (PlayerViewModel, FakeAudioPlayer, FakeAudioSessionEvents) {
+        let player = FakeAudioPlayer()
+        let events = FakeAudioSessionEvents()
+        let model = PlayerViewModel(player: player, session: FakeAudioSession(permission: .granted), events: events)
+        return (model, player, events)
+    }
+
+    private func settle() async {
+        for _ in 0..<5 { await Task.yield() }
+    }
+
+    @Test func anInterruptionPausesPlayback() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+        model.play()
+
+        events.send(.interruptionBegan)
+        await settle()
+
+        #expect(model.state == .paused)
+    }
+
+    @Test func playbackResumesWhenTheInterruptionEndsWithTheHint() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+        model.play()
+        events.send(.interruptionBegan)
+        await settle()
+
+        events.send(.interruptionEnded(shouldResume: true))
+        await settle()
+
+        #expect(model.state == .playing)
+    }
+
+    @Test func playbackStaysPausedWithoutTheHint() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+        model.play()
+        events.send(.interruptionBegan)
+        await settle()
+
+        events.send(.interruptionEnded(shouldResume: false))
+        await settle()
+
+        #expect(model.state == .paused)
+    }
+
+    @Test func anUserPauseIsNeverOverriddenByAnInterruptionEnding() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+        model.play()
+        events.send(.interruptionBegan)
+        await settle()
+        model.pause() // the user decides while interrupted
+
+        events.send(.interruptionEnded(shouldResume: true))
+        await settle()
+
+        #expect(model.state == .paused)
+    }
+
+    @Test func playbackThatWasNotRunningIsNotStartedByAnInterruptionEnding() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+
+        events.send(.interruptionBegan)
+        events.send(.interruptionEnded(shouldResume: true))
+        await settle()
+
+        #expect(model.state == .paused)
+    }
+
+    @Test func unpluggingTheHeadphonesPausesWithoutResumingLater() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+        model.play()
+
+        events.send(.routeLost)
+        await settle()
+        #expect(model.state == .paused)
+
+        events.send(.interruptionEnded(shouldResume: true))
+        await settle()
+        #expect(model.state == .paused)
+    }
+
+    @Test func resetMediaServicesUnloadAndExplain() async {
+        let (model, _, events) = makeModelWithEvents()
+        model.load(url: url)
+        model.play()
+
+        events.send(.mediaServicesReset)
+        await settle()
+
+        #expect(model.state == .idle)
+        #expect(model.errorMessage != nil)
+    }
+
     @Test func loadingAnotherRecordingReplacesTheCurrentOne() {
         let (model, player, _) = makeModel()
         model.load(url: url)

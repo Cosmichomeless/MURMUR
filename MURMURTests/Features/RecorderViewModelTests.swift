@@ -9,6 +9,7 @@ struct RecorderViewModelTests {
         let recorder: FakeAudioRecorder
         let model: RecorderViewModel
         let saved: SavedBox
+        let events: FakeAudioSessionEvents
     }
 
     @MainActor
@@ -21,15 +22,17 @@ struct RecorderViewModelTests {
         let session = FakeAudioSession(permission: permission)
         let recorder = FakeAudioRecorder()
         let saved = SavedBox()
+        let events = FakeAudioSessionEvents()
         let model = RecorderViewModel(
             access: MicrophoneAccess(session: session),
             recorder: recorder,
+            events: events,
             save: { audio in
                 if let error = saved.error { throw error }
                 saved.audios.append(audio)
             }
         )
-        return Harness(session: session, recorder: recorder, model: model, saved: saved)
+        return Harness(session: session, recorder: recorder, model: model, saved: saved, events: events)
     }
 
     /// Lets the consumer task drain the samples that were emitted.
@@ -167,6 +170,149 @@ struct RecorderViewModelTests {
         #expect(h.model.state == .idle)
         #expect(h.saved.audios == [h.recorder.recorded])
         #expect(h.model.notice != nil)
+        #expect(h.session.deactivations == 1)
+    }
+
+    // MARK: - Interruptions and lifecycle
+
+    @Test func anInterruptionPausesTheRecordingAndExplainsWhy() async {
+        let h = makeHarness()
+        await h.model.start()
+
+        h.events.send(.interruptionBegan)
+        await settle()
+
+        #expect(h.model.state == .paused)
+        #expect(h.recorder.pauseCount == 1)
+        #expect(h.model.notice != nil)
+        #expect(h.saved.audios.isEmpty)
+    }
+
+    @Test func anInterruptionWhileIdleOrPausedChangesNothing() async {
+        let h = makeHarness()
+        h.events.send(.interruptionBegan)
+        await settle()
+        #expect(h.model.state == .idle)
+
+        await h.model.start()
+        h.model.pause()
+        h.events.send(.interruptionBegan)
+        await settle()
+
+        #expect(h.model.state == .paused)
+        #expect(h.recorder.pauseCount == 1)
+        #expect(h.model.notice == nil)
+    }
+
+    @Test func theEndOfAnInterruptionNeverResumesByItself() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.events.send(.interruptionBegan)
+        await settle()
+
+        h.events.send(.interruptionEnded(shouldResume: true))
+        await settle()
+
+        #expect(h.model.state == .paused)
+        #expect(h.recorder.resumeCount == 0)
+    }
+
+    @Test func resumingAfterAnInterruptionReactivatesTheSessionAndClearsTheNotice() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.events.send(.interruptionBegan)
+        await settle()
+
+        h.model.resume()
+
+        #expect(h.model.state == .recording)
+        #expect(h.session.recordingActivations == 2)
+        #expect(h.model.notice == nil)
+    }
+
+    @Test func aFailedResumeKeepsWhatWasCaptured() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.events.send(.interruptionBegan)
+        await settle()
+        h.recorder.resumeError = AudioRecorderError.invalidInputFormat
+
+        h.model.resume()
+
+        #expect(h.model.state == .idle)
+        #expect(h.saved.audios == [h.recorder.recorded])
+        #expect(h.model.notice != nil)
+        #expect(h.session.deactivations == 1)
+    }
+
+    @Test func aSessionThatCannotBeReactivatedKeepsWhatWasCaptured() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.model.pause()
+        h.session.activationError = AudioSessionError.configurationFailed("busy")
+
+        h.model.resume()
+
+        #expect(h.model.state == .idle)
+        #expect(h.saved.audios == [h.recorder.recorded])
+        #expect(h.recorder.resumeCount == 0)
+    }
+
+    @Test func resetMediaServicesKeepWhatWasCaptured() async {
+        let h = makeHarness()
+        await h.model.start()
+
+        h.events.send(.mediaServicesReset)
+        await settle()
+
+        #expect(h.model.state == .idle)
+        #expect(h.saved.audios == [h.recorder.recorded])
+        #expect(h.model.notice != nil)
+    }
+
+    @Test func aLostRouteLeavesTheRecordingToTheRecorder() async {
+        let h = makeHarness()
+        await h.model.start()
+
+        h.events.send(.routeLost)
+        await settle()
+
+        #expect(h.model.state == .recording)
+    }
+
+    @Test func withdrawingMicrophoneAccessKeepsWhatWasCaptured() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.session.microphonePermission = .denied
+
+        h.model.permissionDidChange()
+
+        #expect(h.model.state == .idle)
+        #expect(h.saved.audios == [h.recorder.recorded])
+        #expect(h.model.notice != nil)
+    }
+
+    @Test func aStillGrantedPermissionLeavesTheRecordingAlone() async {
+        let h = makeHarness()
+        await h.model.start()
+
+        h.model.permissionDidChange()
+
+        #expect(h.model.state == .recording)
+    }
+
+    @Test func aSaveFailureWhileKeepingAudioSurfacesAsFailed() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.saved.error = CocoaError(.fileWriteOutOfSpace)
+
+        h.events.send(.mediaServicesReset)
+        await settle()
+
+        guard case .failed = h.model.state else {
+            Issue.record("expected a failed state, got \(h.model.state)")
+            return
+        }
         #expect(h.session.deactivations == 1)
     }
 

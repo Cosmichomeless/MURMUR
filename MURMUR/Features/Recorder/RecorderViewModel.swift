@@ -18,18 +18,23 @@ final class RecorderViewModel {
     @ObservationIgnored private let recorder: any AudioRecording
     @ObservationIgnored private let save: (RecordedAudio) throws -> Void
     @ObservationIgnored private var consumer: Task<Void, Never>?
+    @ObservationIgnored private var eventObserver: Task<Void, Never>?
 
-    /// - Parameter save: Takes ownership of a finished recording (moves the temporary file somewhere permanent).
+    /// - Parameters:
+    ///   - events: Session interruptions and route changes. Without it the recorder ignores them.
+    ///   - save: Takes ownership of a finished recording (moves the temporary file somewhere permanent).
     init(
         access: MicrophoneAccess,
         recorder: any AudioRecording,
         waveform: LiveWaveform = LiveWaveform(),
+        events: (any AudioSessionEventSource)? = nil,
         save: @escaping (RecordedAudio) throws -> Void
     ) {
         self.waveform = waveform
         self.access = access
         self.recorder = recorder
         self.save = save
+        if let events { observe(events) }
     }
 
     func start() async {
@@ -60,11 +65,23 @@ final class RecorderViewModel {
     func resume() {
         guard let next = state.applying(.resume) else { return }
         do {
+            // The session may have been taken away while paused (interruption, another app).
+            try access.reactivate()
             try recorder.resume()
             state = next
+            notice = nil
         } catch {
-            fail(error)
+            keepCapturedAudio(because: error.localizedDescription)
         }
+    }
+
+    /// Call when the app returns to the foreground. The user may have withdrawn the microphone
+    /// permission in Settings while a recording was open.
+    func permissionDidChange() {
+        guard state.isCapturing else { return }
+        access.refresh()
+        guard access.permission != .granted else { return }
+        keepCapturedAudio(because: "microphone access was turned off")
     }
 
     /// Stops and saves the recording.
@@ -112,9 +129,40 @@ final class RecorderViewModel {
                     self?.apply(sample)
                 }
             } catch {
-                self?.recoverFromStreamFailure(error)
+                self?.keepCapturedAudio(because: error.localizedDescription)
             }
         }
+    }
+
+    private func observe(_ events: any AudioSessionEventSource) {
+        let stream = events.subscribe()
+        eventObserver = Task { [weak self] in
+            for await event in stream {
+                guard let self else { return }
+                self.handle(event)
+            }
+        }
+    }
+
+    private func handle(_ event: AudioSessionEvent) {
+        switch event {
+        case .interruptionBegan:
+            pauseForInterruption()
+        case .mediaServicesReset:
+            keepCapturedAudio(because: "audio services were reset")
+        case .interruptionEnded, .routeLost:
+            // Resuming a microphone on its own would be a surprise, so the user taps resume.
+            // An input lost mid-capture is reported by the recorder as a configuration change.
+            break
+        }
+    }
+
+    /// A call or another app took the audio. Pause rather than stop: the user decides what's next.
+    private func pauseForInterruption() {
+        guard state == .recording, let next = state.applying(.pause) else { return }
+        recorder.pause()
+        state = next
+        notice = "Paused because another app took the microphone. Tap resume to continue."
     }
 
     private func apply(_ sample: RecorderSample) {
@@ -124,27 +172,21 @@ final class RecorderViewModel {
         elapsed = sample.duration
     }
 
-    /// The capture broke (disk full, route lost…). Keep whatever was written before it.
-    private func recoverFromStreamFailure(_ error: any Error) {
+    /// The capture broke (disk full, input lost, permission withdrawn…). Keep whatever was written
+    /// before it: a long recording is worth more than a clean failure.
+    private func keepCapturedAudio(because reason: String) {
         guard state.isCapturing else { return }
-        consumer = nil
+        stopConsuming()
         defer { access.releaseSession() }
         do {
             let audio = try recorder.stop()
             try save(audio)
             state = .idle
             elapsed = 0
-            notice = "Recording stopped early (\(error.localizedDescription)). What was captured has been saved."
+            notice = "Recording stopped early (\(reason)). What was captured has been saved."
         } catch {
             state = .failed(error.localizedDescription)
         }
-    }
-
-    private func fail(_ error: any Error) {
-        stopConsuming()
-        recorder.discard()
-        access.releaseSession()
-        state = .failed(error.localizedDescription)
     }
 
     private func stopConsuming() {

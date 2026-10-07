@@ -5,9 +5,11 @@ enum AudioRecorderError: Error, Equatable, LocalizedError {
     case notRecording
     case invalidInputFormat
     case noAudioCaptured
+    case configurationChanged
 
     var errorDescription: String? {
         switch self {
+        case .configurationChanged: "The audio input changed."
         case .alreadyRecording: "A recording is already in progress."
         case .notRecording: "There is no recording in progress."
         case .invalidInputFormat: "The microphone is not available."
@@ -27,6 +29,7 @@ final class AudioRecorder: AudioRecording {
     private var engine: AVAudioEngine?
     private var processor: RecordingTapProcessor?
     private var fileURL: URL?
+    private var configurationObserver: (any NSObjectProtocol)?
 
     init(makeTemporaryURL: @escaping () -> URL, removeFile: @escaping (URL) -> Void) {
         self.makeTemporaryURL = makeTemporaryURL
@@ -78,6 +81,7 @@ final class AudioRecorder: AudioRecording {
         self.engine = engine
         self.processor = processor
         self.fileURL = url
+        configurationObserver = Self.observeConfigurationChanges(of: engine, continuation: continuation)
         return stream
     }
 
@@ -120,6 +124,10 @@ final class AudioRecorder: AudioRecording {
     // MARK: - Private
 
     private func tearDown(engine: AVAudioEngine) {
+        if let configurationObserver {
+            NotificationCenter.default.removeObserver(configurationObserver)
+            self.configurationObserver = nil
+        }
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
     }
@@ -128,6 +136,22 @@ final class AudioRecorder: AudioRecording {
         engine = nil
         processor = nil
         fileURL = nil
+    }
+
+    /// The engine stops by itself when the input changes (headset unplugged, sample rate switched…) and
+    /// the file's format no longer matches the hardware. Ending the stream with an error lets the
+    /// owner keep what was captured instead of continuing into a mismatched file.
+    private nonisolated static func observeConfigurationChanges(
+        of engine: AVAudioEngine,
+        continuation: AsyncThrowingStream<RecorderSample, Error>.Continuation
+    ) -> any NSObjectProtocol {
+        NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange,
+            object: engine,
+            queue: .main
+        ) { _ in
+            continuation.finish(throwing: AudioRecorderError.configurationChanged)
+        }
     }
 
     /// `nonisolated` so the tap closure is not inferred as main-actor isolated.

@@ -25,6 +25,16 @@ final class MicrophoneAccess {
         session.deactivate()
     }
 
+    /// Activates the session again for a capture that is already under way.
+    ///
+    /// An interruption deactivates the session, so resuming must not assume it is still active.
+    /// Throws if the permission was withdrawn in the meantime.
+    func reactivate() throws {
+        refresh()
+        guard permission == .granted else { throw AudioSessionError.microphoneAccessDenied }
+        try session.activateForRecording()
+    }
+
     /// Resolves the permission (showing the system prompt if needed) and activates the session.
     ///
     /// Returns `true` only when it is safe to start capturing. On denial or failure nothing is

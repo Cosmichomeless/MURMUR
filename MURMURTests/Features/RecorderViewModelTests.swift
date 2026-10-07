@@ -66,6 +66,21 @@ struct RecorderViewModelTests {
         #expect(h.model.elapsed == 1.25)
     }
 
+    @Test func levelsFeedTheLiveWaveformAndStartClearsIt() async {
+        let h = makeHarness()
+        await h.model.start()
+        h.recorder.emit(duration: 0.05, level: 0.2)
+        h.recorder.emit(duration: 0.10, level: 0.8)
+        await settle()
+
+        #expect(h.model.waveform.count == 2)
+        #expect(h.model.waveform[1] == 0.8)
+
+        h.model.discard()
+        await h.model.start()
+        #expect(h.model.waveform.count == 0)
+    }
+
     @Test func pauseAndResumeDriveTheRecorder() async {
         let h = makeHarness()
         await h.model.start()

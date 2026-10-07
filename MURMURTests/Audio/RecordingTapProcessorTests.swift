@@ -74,6 +74,21 @@ struct RecordingTapProcessorTests {
         #expect(samples.last!.level > 0.5)
     }
 
+    @Test func keepsABoundedWaveformSummaryOfLongCaptures() throws {
+        let store = TestStore()
+        defer { store.cleanUp() }
+        let (processor, _, _) = try makeProcessor(in: store)
+
+        let buffer = Self.sineBuffer(frames: 1024, amplitude: 0.5)
+        for _ in 0..<20_000 { processor.process(buffer) } // ≈ 7.7 minutes
+        let waveform = processor.waveform
+        _ = processor.finish()
+
+        #expect(waveform.count >= RecordingTapProcessor.waveformBinCount)
+        #expect(waveform.count <= 2 * RecordingTapProcessor.waveformBinCount + 1)
+        #expect(waveform.allSatisfy { (0...1).contains($0) })
+    }
+
     @Test func pausedBuffersAreNotWritten() throws {
         let store = TestStore()
         defer { store.cleanUp() }

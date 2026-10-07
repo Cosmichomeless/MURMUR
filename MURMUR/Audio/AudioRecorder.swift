@@ -99,13 +99,14 @@ final class AudioRecorder: AudioRecording {
 
         let frames = processor.finish()
         let sampleRate = processor.sampleRate
+        let waveform = processor.waveform
         reset()
 
         guard frames > 0 else {
             removeFile(url)
             throw AudioRecorderError.noAudioCaptured
         }
-        return RecordedAudio(fileURL: url, duration: Double(frames) / sampleRate, waveform: [])
+        return RecordedAudio(fileURL: url, duration: Double(frames) / sampleRate, waveform: waveform)
     }
 
     func discard() {

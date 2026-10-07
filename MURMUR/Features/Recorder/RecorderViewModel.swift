@@ -10,6 +10,8 @@ final class RecorderViewModel {
     /// A non-blocking message, e.g. when a failure still left a usable recording.
     private(set) var notice: String?
 
+    /// Separate observable: only the waveform view redraws at the sample rate.
+    @ObservationIgnored let waveform: LiveWaveform
     @ObservationIgnored private let access: MicrophoneAccess
     @ObservationIgnored private let recorder: any AudioRecording
     @ObservationIgnored private let save: (RecordedAudio) throws -> Void
@@ -19,8 +21,10 @@ final class RecorderViewModel {
     init(
         access: MicrophoneAccess,
         recorder: any AudioRecording,
+        waveform: LiveWaveform = LiveWaveform(),
         save: @escaping (RecordedAudio) throws -> Void
     ) {
+        self.waveform = waveform
         self.access = access
         self.recorder = recorder
         self.save = save
@@ -36,6 +40,7 @@ final class RecorderViewModel {
             let samples = try recorder.start()
             state = next
             elapsed = 0
+            waveform.reset()
             notice = nil
             consume(samples)
         } catch {
@@ -110,6 +115,7 @@ final class RecorderViewModel {
     }
 
     private func apply(_ sample: RecorderSample) {
+        waveform.append(sample.level)
         // Only publish when the displayed tenth of a second changes: fewer view updates.
         guard Int(sample.duration * 10) != Int(elapsed * 10) else { return }
         elapsed = sample.duration

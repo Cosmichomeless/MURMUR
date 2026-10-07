@@ -105,6 +105,7 @@ struct RecorderViewModelTests {
         #expect(h.model.state == .idle)
         #expect(h.model.elapsed == 0)
         #expect(h.saved.audios == [h.recorder.recorded])
+        #expect(h.model.savedCount == 1)
         #expect(h.session.deactivations == 1)
     }
 

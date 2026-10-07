@@ -7,6 +7,8 @@ import Observation
 final class RecorderViewModel {
     private(set) var state: RecorderState = .idle
     private(set) var elapsed: TimeInterval = 0
+    /// Increments each time a recording is saved by `stop()`; views observe it to close the recorder.
+    private(set) var savedCount = 0
     /// A non-blocking message, e.g. when a failure still left a usable recording.
     private(set) var notice: String?
 
@@ -75,6 +77,7 @@ final class RecorderViewModel {
             try save(audio)
             state = next
             elapsed = 0
+            savedCount += 1
         } catch {
             state = .failed(error.localizedDescription)
         }

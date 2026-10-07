@@ -1,7 +1,9 @@
+import SwiftData
 import SwiftUI
 
 @main
 struct MURMURApp: App {
+    private let container: ModelContainer
     @State private var microphoneAccess: MicrophoneAccess
     @State private var recorder: RecorderViewModel
 
@@ -9,6 +11,19 @@ struct MURMURApp: App {
         let fileStore = RecordingFileStore.default
         try? fileStore.prepareDirectories()
 
+        let container: ModelContainer
+        do {
+            container = try PersistenceController.makeContainer()
+        } catch {
+            fatalError("Could not open the recordings store: \(error)")
+        }
+        self.container = container
+        let context = container.mainContext
+
+        // Bring files and metadata back in line after a crash or interrupted save.
+        _ = try? RecordingReconciler(context: context, fileStore: fileStore).run()
+
+        let repository = RecordingRepository(context: context, fileStore: fileStore)
         let access = MicrophoneAccess(session: AudioSessionManager())
         let audioRecorder = AudioRecorder(
             makeTemporaryURL: { fileStore.makeTemporaryURL() },
@@ -18,8 +33,13 @@ struct MURMURApp: App {
         _recorder = State(initialValue: RecorderViewModel(
             access: access,
             recorder: audioRecorder,
-            // Moves the temporary capture into the recordings folder. Metadata is added with the library.
-            save: { _ = try fileStore.commit(temporaryURL: $0.fileURL) }
+            save: { audio in
+                try repository.save(
+                    temporaryURL: audio.fileURL,
+                    duration: audio.duration,
+                    waveform: audio.waveform
+                )
+            }
         ))
     }
 
@@ -27,5 +47,6 @@ struct MURMURApp: App {
         WindowGroup {
             RootView(microphoneAccess: microphoneAccess, recorder: recorder)
         }
+        .modelContainer(container)
     }
 }

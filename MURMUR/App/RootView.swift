@@ -2,15 +2,15 @@ import SwiftUI
 
 /// Temporary shell. Replaced by the Library screen when recordings are listed.
 struct RootView: View {
-    var body: some View {
-        ContentUnavailableView(
-            "MURMUR",
-            systemImage: "waveform",
-            description: Text("Voice notes with a live waveform.")
-        )
-    }
-}
+    let microphoneAccess: MicrophoneAccess
+    @Environment(\.scenePhase) private var scenePhase
 
-#Preview {
-    RootView()
+    var body: some View {
+        MicrophonePermissionView(access: microphoneAccess)
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    microphoneAccess.refresh()
+                }
+            }
+    }
 }

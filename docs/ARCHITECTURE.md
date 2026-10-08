@@ -1,7 +1,8 @@
 # MURMUR — Architecture
 
-Phase 2 of the roadmap: the audio pipeline, the state ownership and the dependency boundaries.
-Product scope lives in [PRODUCT.md](PRODUCT.md).
+The audio pipeline, the state ownership and the dependency boundaries. Product scope lives in
+[PRODUCT.md](PRODUCT.md); audio lifecycle and trade-offs in [AUDIO.md](AUDIO.md); measured cost in
+[PERFORMANCE.md](PERFORMANCE.md).
 
 ## Principles
 
@@ -16,7 +17,7 @@ Product scope lives in [PRODUCT.md](PRODUCT.md).
 
 ```text
 ┌──────────────────────────── SwiftUI Views ────────────────────────────┐
-│  Features/Recorder      Features/Recordings      Features/Player       │
+│  Features/Recorder      Features/Library         Features/Player       │
 └───────────────▲──────────────────▲──────────────────────▲─────────────┘
                 │ observes         │ observes             │ observes
 ┌───────────────┴──────────────────┴──────────────────────┴─────────────┐
@@ -48,15 +49,15 @@ Rules:
 MURMUR/
 ├── App/              app entry point, dependency container, root navigation
 ├── Audio/            session, recorder, player, waveform math (no UI, no SwiftData)
-├── Persistence/      SwiftData model, file store, repository
+├── Persistence/      SwiftData model, file store, repository, launch reconciler
+├── Design/           brand tokens (colors, spacing, shadow) and button styles
 ├── Features/
-│   ├── Recorder/     recorder screen + view model
-│   ├── Recordings/   library screen + view model
-│   └── Player/       player screen + view model
-├── Components/       reusable views (waveform, buttons)
-└── Utilities/        small shared helpers
-MURMURTests/          Swift Testing unit tests
-docs/                 product, architecture and release documents
+│   ├── Library/      recordings list, empty state, record button
+│   ├── Recorder/     recorder screen, view model, microphone access
+│   ├── Player/       player screen + view model
+│   └── Waveform/     live and static waveform views
+MURMURTests/          Swift Testing unit tests, grouped like the sources, plus Support/ fakes
+docs/                 product, architecture, audio, persistence and performance documents
 ```
 
 The Xcode project uses synchronized folders: a file added under `MURMUR/` or `MURMURTests/` joins
@@ -128,7 +129,7 @@ controls update on their own cadence.
 
 SwiftData stores metadata; the audio file lives in the file system. They are kept consistent by the
 repository using a defined order of operations and a launch-time reconciliation. Details and the
-file locations are in the persistence design (issue #3, `docs/PERSISTENCE.md` once added).
+file locations are in [PERSISTENCE.md](PERSISTENCE.md).
 
 ## Error handling
 
@@ -137,6 +138,9 @@ file locations are in the persistence design (issue #3, `docs/PERSISTENCE.md` on
 - Programmer errors are not silenced: `AudioRecording`/`AudioPlaying` throw typed errors;
   view models map them to messages.
 - Permission is re-read whenever the app becomes active.
+
+Interruptions, route changes and media-services resets are covered in
+[AUDIO.md](AUDIO.md#lifecycle-and-interruptions), together with the audio trade-offs.
 
 ## Testing strategy
 

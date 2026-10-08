@@ -17,11 +17,7 @@ struct LibraryView: View {
         NavigationStack {
             Group {
                 if recordings.isEmpty {
-                    ContentUnavailableView(
-                        "No recordings yet",
-                        systemImage: "waveform",
-                        description: Text("Tap the microphone to record your first voice note.")
-                    )
+                    EmptyLibraryView()
                 } else {
                     List(recordings) { recording in
                         NavigationLink(value: recording) {
@@ -43,16 +39,17 @@ struct LibraryView: View {
                     model: player
                 )
             }
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        // Capture and playback must not overlap: they need different session categories.
-                        player.stop()
-                        isRecording = true
-                    } label: {
-                        Label("Record", systemImage: "mic.fill")
-                    }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    // Capture and playback must not overlap: they need different session categories.
+                    player.stop()
+                    isRecording = true
+                } label: {
+                    Image(systemName: "mic.fill")
                 }
+                .buttonStyle(BrandRoundButtonStyle(kind: .accent, size: 64))
+                .accessibilityLabel("Record")
+                .padding(.bottom, Brand.Spacing.small)
             }
             .confirmationDialog(
                 "Delete this recording?",
@@ -102,6 +99,8 @@ private struct RecorderSheet: View {
     var body: some View {
         NavigationStack {
             RecorderView(model: model, access: access)
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbarColorScheme(.dark, for: .navigationBar)
                 .toolbar {
                     if !model.state.isCapturing {
                         ToolbarItem(placement: .cancellationAction) {
@@ -112,5 +111,30 @@ private struct RecorderSheet: View {
         }
         .interactiveDismissDisabled(model.state.isCapturing)
         .onChange(of: model.savedCount) { dismiss() }
+    }
+}
+
+/// Shown before the first recording: the icon's tile and a pointer to the record button.
+private struct EmptyLibraryView: View {
+    var body: some View {
+        VStack(spacing: Brand.Spacing.medium) {
+            Image(systemName: "waveform")
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 88, height: 88)
+                .background(Brand.gradient, in: RoundedRectangle(cornerRadius: Brand.Radius.card + 6))
+                .shadow(color: Brand.Shadow.color, radius: Brand.Shadow.radius, y: Brand.Shadow.offset)
+                .accessibilityHidden(true)
+
+            Text("No recordings yet")
+                .font(.title3.weight(.semibold))
+            Text("Tap the microphone to record your first voice note.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(Brand.Spacing.large)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
     }
 }

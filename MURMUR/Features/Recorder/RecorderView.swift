@@ -3,14 +3,15 @@ import SwiftUI
 struct RecorderView: View {
     let model: RecorderViewModel
     let access: MicrophoneAccess
+    @ScaledMetric(relativeTo: .largeTitle) private var clockSize: CGFloat = 56
 
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: Brand.Spacing.extraLarge) {
             if access.permission == .denied && !model.state.isCapturing {
                 MicrophonePermissionView(access: access)
             } else {
                 Text(Self.format(model.elapsed))
-                    .font(.system(size: 56, weight: .light, design: .monospaced))
+                    .font(.system(size: clockSize, weight: .light, design: .monospaced))
                     .contentTransition(.numericText())
                     .accessibilityLabel("Elapsed time")
                     .accessibilityValue(Self.format(model.elapsed))
@@ -22,17 +23,26 @@ struct RecorderView: View {
                 controls
 
                 if case .failed(let message) = model.state {
-                    VStack(spacing: 8) {
-                        Text(message).font(.footnote).foregroundStyle(.red)
+                    VStack(spacing: Brand.Spacing.small) {
+                        Label(message, systemImage: "exclamationmark.triangle.fill")
+                            .font(.footnote)
+                            .symbolRenderingMode(.multicolor)
+                            .multilineTextAlignment(.center)
                         Button("Dismiss") { model.dismissFailure() }
+                            .buttonStyle(BrandPillButtonStyle())
                     }
                 }
                 if let notice = model.notice {
-                    Text(notice).font(.footnote).foregroundStyle(.secondary)
+                    Text(notice)
+                        .font(.footnote)
+                        .foregroundStyle(Brand.onGradientSecondary)
+                        .multilineTextAlignment(.center)
                 }
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .brandScreen()
     }
 
     @ViewBuilder
@@ -42,27 +52,30 @@ struct RecorderView: View {
             Button {
                 Task { await model.start() }
             } label: {
-                Image(systemName: "mic.circle.fill").font(.system(size: 72))
+                Image(systemName: "mic.fill")
             }
+            .buttonStyle(BrandRoundButtonStyle(kind: .accent, size: 80))
             .accessibilityLabel("Start recording")
         case .recording, .paused:
-            HStack(spacing: 32) {
+            HStack(spacing: Brand.Spacing.extraLarge) {
                 Button(role: .destructive) { model.discard() } label: {
-                    Image(systemName: "trash.circle.fill").font(.system(size: 48))
+                    Image(systemName: "trash.fill")
                 }
+                .buttonStyle(BrandRoundButtonStyle(kind: .quiet, size: 56))
                 .accessibilityLabel("Discard recording")
 
                 Button {
                     model.state == .recording ? model.pause() : model.resume()
                 } label: {
-                    Image(systemName: model.state == .recording ? "pause.circle.fill" : "record.circle.fill")
-                        .font(.system(size: 72))
+                    Image(systemName: model.state == .recording ? "pause.fill" : "mic.fill")
                 }
+                .buttonStyle(BrandRoundButtonStyle(kind: .accent, size: 80))
                 .accessibilityLabel(model.state == .recording ? "Pause recording" : "Resume recording")
 
                 Button { model.stop() } label: {
-                    Image(systemName: "stop.circle.fill").font(.system(size: 48))
+                    Image(systemName: "stop.fill")
                 }
+                .buttonStyle(BrandRoundButtonStyle(kind: .light, size: 56))
                 .accessibilityLabel("Stop and save")
             }
         }

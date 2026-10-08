@@ -6,17 +6,17 @@ struct MicrophonePermissionView: View {
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Brand.Spacing.medium) {
             Image(systemName: symbol)
                 .font(.system(size: 40))
-                .foregroundStyle(tint)
+                .foregroundStyle(access.permission == .granted ? Brand.onGradient : Brand.coral)
                 .accessibilityHidden(true)
 
             Text(title)
                 .font(.headline)
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Brand.onGradientSecondary)
                 .multilineTextAlignment(.center)
 
             switch access.permission {
@@ -24,22 +24,23 @@ struct MicrophonePermissionView: View {
                 Button("Allow microphone") {
                     Task { _ = await access.prepareForRecording() }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(BrandPillButtonStyle())
             case .denied:
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         openURL(url)
                     }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(BrandPillButtonStyle())
             case .granted:
                 EmptyView()
             }
 
             if let error = access.sessionError {
-                Text(error)
+                Label(error, systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .symbolRenderingMode(.multicolor)
+                    .multilineTextAlignment(.center)
             }
         }
         .padding()
@@ -51,14 +52,6 @@ struct MicrophonePermissionView: View {
         case .undetermined: "mic.badge.plus"
         case .granted: "mic.fill"
         case .denied: "mic.slash.fill"
-        }
-    }
-
-    private var tint: Color {
-        switch access.permission {
-        case .undetermined: .orange
-        case .granted: .green
-        case .denied: .red
         }
     }
 

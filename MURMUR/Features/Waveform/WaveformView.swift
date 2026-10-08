@@ -1,8 +1,11 @@
 import SwiftUI
 
-/// Draws the live waveform as vertical bars, newest on the right.
+/// Draws the live waveform as vertical bars, newest on the right. Like the app icon, the bars are
+/// white and fully rounded, and the newest one is the coral accent.
 struct WaveformView: View {
     let waveform: LiveWaveform
+    var barColor: Color = .white
+    var accentColor: Color = Brand.coral
     var barSpacing: CGFloat = 2
     var minimumBarHeight: CGFloat = 2
 
@@ -26,7 +29,8 @@ struct WaveformView: View {
                     width: barWidth,
                     height: height
                 )
-                context.fill(Path(roundedRect: rect, cornerRadius: barWidth / 2), with: .color(.accentColor))
+                let color = index == count - 1 ? accentColor : barColor
+                context.fill(Path(roundedRect: rect, cornerRadius: barWidth / 2), with: .color(color))
             }
         }
         .accessibilityHidden(true)

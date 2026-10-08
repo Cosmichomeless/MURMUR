@@ -15,12 +15,10 @@ struct PlayerView: View {
     }
 
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 4) {
-                Text(recording.createdAt.formatted(date: .complete, time: .shortened))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+        VStack(spacing: Brand.Spacing.large) {
+            Text(recording.createdAt.formatted(date: .complete, time: .shortened))
+                .font(.subheadline)
+                .foregroundStyle(Brand.onGradientSecondary)
 
             StaticWaveformView(levels: recording.waveform, progress: shownProgress)
                 .frame(height: 96)
@@ -35,6 +33,7 @@ struct PlayerView: View {
                         scrubTime = nil
                     }
                 }
+                .tint(Brand.coral)
                 .disabled(!model.isLoaded)
                 .accessibilityLabel("Playback position")
                 .accessibilityValue("\(DurationFormat.clock(shownTime)) of \(DurationFormat.clock(model.duration))")
@@ -45,39 +44,43 @@ struct PlayerView: View {
                     Text(DurationFormat.clock(model.duration))
                 }
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Brand.onGradientSecondary)
             }
 
             Button {
                 model.togglePlayPause()
             } label: {
                 Image(systemName: playbackSymbol)
-                    .font(.system(size: 64))
             }
+            .buttonStyle(BrandRoundButtonStyle(kind: .accent, size: 80))
             .disabled(!model.isLoaded)
             .accessibilityLabel(playbackLabel)
 
             if let message = model.errorMessage {
-                Text(message)
+                Label(message, systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .symbolRenderingMode(.multicolor)
                     .multilineTextAlignment(.center)
             }
 
             Spacer()
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .brandScreen()
         .navigationTitle(recording.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear { model.load(url: fileURL) }
         .onDisappear { model.stop() }
     }
 
     private var playbackSymbol: String {
         switch model.state {
-        case .playing: "pause.circle.fill"
-        case .finished: "arrow.counterclockwise.circle.fill"
-        case .idle, .paused: "play.circle.fill"
+        case .playing: "pause.fill"
+        case .finished: "arrow.counterclockwise"
+        case .idle, .paused: "play.fill"
         }
     }
 

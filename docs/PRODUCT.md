@@ -15,7 +15,7 @@ MURMUR is a small, local-only voice-notes app that:
 - keeps every note on the device with its metadata;
 - lets the user find, replay and delete notes quickly.
 
-It is also a deliberately technical project (see the README): the product is intentionally small so
+It is also a deliberately technical project (see [PROJECT.md](PROJECT.md)): the product is intentionally small so
 the engineering effort goes into audio capture, real-time rendering and lifecycle correctness.
 
 ## Target user
@@ -61,7 +61,7 @@ These decisions unblock the architecture (#2) and persistence (#3) work.
 
 ### 1. Library (home)
 
-- Navigation title **Recordings**.
+- Large navigation title **MURMUR**.
 - List of recordings, newest first. Each row: title, duration, creation date.
 - Primary **Record** button always reachable (bottom of the screen).
 - Swipe to delete. Tap a row to open the player.

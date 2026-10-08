@@ -57,7 +57,7 @@ MURMUR/
 │   ├── Player/       player screen + view model
 │   └── Waveform/     live and static waveform views
 MURMURTests/          Swift Testing unit tests, grouped like the sources, plus Support/ fakes
-docs/                 product, architecture, audio, persistence and performance documents
+docs/                 product, architecture, audio, persistence, performance, demo and release documents
 ```
 
 The Xcode project uses synchronized folders: a file added under `MURMUR/` or `MURMURTests/` joins

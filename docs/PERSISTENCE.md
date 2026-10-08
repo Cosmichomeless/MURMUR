@@ -17,7 +17,7 @@ Recording (SwiftData @Model)
 
 Decisions:
 
-- **`fileName` instead of `fileURL`.** The README sketch lists `fileURL`. An absolute URL is invalid
+- **`fileName` instead of `fileURL`.** The original sketch in [PROJECT.md](PROJECT.md) lists `fileURL`. An absolute URL is invalid
   after a reinstall, an update or a simulator reset because the container path changes. The model
   stores the name and `fileURL(in:)` resolves it against `RecordingFileStore`.
 - **`waveformData` as `Data`.** The envelope is a flat `[Float]` of at most a few hundred values;

@@ -11,9 +11,12 @@ struct WaveformView: View {
 
     var body: some View {
         // Reading `revision` is what subscribes this view (and only this view) to new levels.
-        let _ = waveform.revision
+        let revision = waveform.revision
 
         Canvas { context, size in
+            // The canvas closure only otherwise captures the same `waveform` reference every time, so
+            // SwiftUI would see it as unchanged and never redraw. Capturing the revision makes it differ.
+            _ = revision
             let capacity = waveform.capacity
             let slot = size.width / CGFloat(capacity)
             let barWidth = max(slot - barSpacing, 1)

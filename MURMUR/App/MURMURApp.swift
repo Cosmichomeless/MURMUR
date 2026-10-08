@@ -10,12 +10,13 @@ struct MURMURApp: App {
     private let repository: RecordingRepository
 
     init() {
-        let fileStore = RecordingFileStore.default
+        let services = AppServices.make()
+        let fileStore = services.fileStore
         try? fileStore.prepareDirectories()
 
         let container: ModelContainer
         do {
-            container = try PersistenceController.makeContainer()
+            container = try PersistenceController.makeContainer(inMemory: services.inMemory)
         } catch {
             fatalError("Could not open the recordings store: \(error)")
         }
@@ -27,18 +28,16 @@ struct MURMURApp: App {
 
         let repository = RecordingRepository(context: context, fileStore: fileStore)
         self.repository = repository
-        let session = AudioSessionManager()
+        try? services.seedLibrary?(repository)
+
+        let session = services.session
         let access = MicrophoneAccess(session: session)
         let events = AudioSessionEvents()
         _player = State(initialValue: PlayerViewModel(player: AudioPlayer(), session: session, events: events))
-        let audioRecorder = AudioRecorder(
-            makeTemporaryURL: { fileStore.makeTemporaryURL() },
-            removeFile: { fileStore.removeTemporary(at: $0) }
-        )
         _microphoneAccess = State(initialValue: access)
         _recorder = State(initialValue: RecorderViewModel(
             access: access,
-            recorder: audioRecorder,
+            recorder: services.recorder,
             events: events,
             save: { audio in
                 try repository.save(

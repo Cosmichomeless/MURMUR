@@ -289,8 +289,9 @@ The objective is:
 
 ## Status
 
-🚧 **In development**
+🚧 **In development** — Phases 1 to 12 of the roadmap are done and the MVP is complete (`0.1.0`).
 
-Current stage:
-
-**Phase 1 — Product Definition**
+- What changed: [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
+- Run it without a microphone: [docs/DEMO.md](docs/DEMO.md)
+- How it works: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/AUDIO.md](docs/AUDIO.md),
+  [docs/PERSISTENCE.md](docs/PERSISTENCE.md), [docs/PERFORMANCE.md](docs/PERFORMANCE.md)

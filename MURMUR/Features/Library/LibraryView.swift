@@ -10,11 +10,12 @@ struct LibraryView: View {
 
     @Query(Recording.newestFirst()) private var recordings: [Recording]
     @State private var isRecording = false
+    @State private var path: [Recording] = []
     @State private var pendingDeletion: Recording?
     @State private var deletionMessage: String?
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if recordings.isEmpty {
                     EmptyLibraryView()
@@ -76,8 +77,34 @@ struct LibraryView: View {
                 RecorderSheet(model: recorder, access: microphoneAccess)
             }
         }
+        #if DEBUG
+        .task { await openDemoScreen() }
+        #endif
     }
 }
+
+#if DEBUG
+extension LibraryView {
+    /// `-murmur-demo-screen recorder|player`: lands on a screen that otherwise needs taps, so the
+    /// screenshots can be retaken from the command line.
+    private func openDemoScreen() async {
+        guard let screen = DemoMode.startScreen else { return }
+        try? await Task.sleep(for: .milliseconds(600))
+        switch screen {
+        case .recorder:
+            isRecording = true
+            try? await Task.sleep(for: .milliseconds(800))
+            await recorder.start()
+        case .player:
+            guard let recording = recordings.first(where: { $0.title == DemoLibrary.playerTitle }) else { return }
+            path = [recording]
+            try? await Task.sleep(for: .milliseconds(800))
+            // Paused partway through, so every capture shows the same frame.
+            player.seek(to: recording.duration * 0.35)
+        }
+    }
+}
+#endif
 
 extension LibraryView {
     private func delete(_ recording: Recording) {

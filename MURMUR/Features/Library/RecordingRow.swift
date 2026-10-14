@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RecordingRow: View {
     let recording: Recording
+    /// What a search found in the transcript, shown under the title.
+    var moment: RecordingSearchResult.Moment?
 
     var body: some View {
         HStack(spacing: Brand.Spacing.medium) {
@@ -17,17 +19,45 @@ struct RecordingRow: View {
                 Text(recording.title)
                     .font(.headline)
                     .lineLimit(1)
-                Text(recording.createdAt.formatted(date: .abbreviated, time: .shortened))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let moment {
+                    Text(moment.snippet)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                } else {
+                    Text(recording.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                if !recording.tags.isEmpty {
+                    Text(recording.tags.map { "#\($0)" }.joined(separator: " "))
+                        .font(.caption)
+                        .foregroundStyle(Brand.coral)
+                        .lineLimit(1)
+                }
             }
             Spacer()
-            Text(DurationFormat.clock(recording.duration))
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(.secondary)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(DurationFormat.clock(recording.duration))
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                if let time = moment?.time {
+                    Label(DurationFormat.clock(time), systemImage: "play.circle.fill")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Brand.coral)
+                        .labelStyle(.titleAndIcon)
+                }
+            }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(recording.title)
-        .accessibilityValue("\(DurationFormat.clock(recording.duration)), \(recording.createdAt.formatted(date: .abbreviated, time: .shortened))")
+        .accessibilityValue(accessibilityValue)
+    }
+
+    private var accessibilityValue: String {
+        var parts = ["\(DurationFormat.clock(recording.duration)), \(recording.createdAt.formatted(date: .abbreviated, time: .shortened))"]
+        if !recording.tags.isEmpty { parts.append(recording.tags.joined(separator: ", ")) }
+        if let moment { parts.append(moment.snippet) }
+        return parts.joined(separator: ". ")
     }
 }

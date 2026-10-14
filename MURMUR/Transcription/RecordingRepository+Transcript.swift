@@ -62,7 +62,8 @@ extension RecordingRepository {
         }
     }
 
-    private func commit(_ change: () -> Void) throws {
+    /// Applies a change and saves; if saving fails the change is rolled back and the error thrown.
+    func commit(_ change: () -> Void) throws {
         change()
         do {
             try context.save()

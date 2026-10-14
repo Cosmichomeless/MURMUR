@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 /// The current version of the model. Older versions live in `Schema/` for migrations only.
-typealias Recording = MurmurSchemaV2.Recording
+typealias Recording = MurmurSchemaV3.Recording
 
 extension Recording {
     var waveform: [Float] {

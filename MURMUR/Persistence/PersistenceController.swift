@@ -3,7 +3,7 @@ import SwiftData
 
 enum PersistenceController {
     /// The newest schema. Stores written by older versions are migrated by `MurmurMigrationPlan`.
-    static let schema = Schema(versionedSchema: MurmurSchemaV2.self)
+    static let schema = Schema(versionedSchema: MurmurSchemaV3.self)
 
     /// The app's container. `inMemory` is for tests and previews; `storeURL` pins the on-disk
     /// location (tests use it to simulate a relaunch against the same store).

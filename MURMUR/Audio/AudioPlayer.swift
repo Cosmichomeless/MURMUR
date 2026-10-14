@@ -8,11 +8,11 @@ enum AudioPlayerError: Error, Equatable, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .cannotLoad(let reason):
-            "The recording could not be opened: \(reason)"
+            String(localized: "The recording could not be opened: \(reason)")
         case .nothingLoaded:
-            "There is no recording loaded."
+            String(localized: "There is no recording loaded.")
         case .cannotPlay:
-            "The recording could not be played."
+            String(localized: "The recording could not be played.")
         }
     }
 }

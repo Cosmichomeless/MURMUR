@@ -40,7 +40,7 @@ struct RecordingRepositoryTests {
         )
 
         #expect(recording.title == RecordingRepository.defaultTitle(for: date))
-        #expect(recording.title.hasPrefix("Recording "))
+        #expect(recording.title.hasPrefix(String(localized: "Recording") + " "))
     }
 
     @Test func aMissingCaptureSavesNothing() throws {

@@ -138,7 +138,7 @@ final class PlayerViewModel {
         case .mediaServicesReset:
             guard isLoaded else { return }
             release()
-            errorMessage = "Audio services were reset. Open the recording again."
+            errorMessage = String(localized: "Audio services were reset. Open the recording again.")
         }
     }
 

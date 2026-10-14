@@ -63,7 +63,7 @@ struct RecordingRepository {
     }
 
     nonisolated static func defaultTitle(for date: Date) -> String {
-        "Recording \(date.formatted(date: .abbreviated, time: .shortened))"
+        String(localized: "Recording \(date.formatted(date: .abbreviated, time: .shortened))")
     }
 }
 

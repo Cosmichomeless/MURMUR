@@ -41,7 +41,7 @@ struct PlayerView: View {
                 .tint(Brand.coral)
                 .disabled(!model.isLoaded)
                 .accessibilityLabel("Playback position")
-                .accessibilityValue("\(DurationFormat.clock(shownTime)) of \(DurationFormat.clock(model.duration))")
+                .accessibilityValue(String(localized: "\(DurationFormat.clock(shownTime)) of \(DurationFormat.clock(model.duration))"))
 
                 HStack {
                     Text(DurationFormat.clock(shownTime))
@@ -117,9 +117,9 @@ struct PlayerView: View {
 
     private var playbackLabel: String {
         switch model.state {
-        case .playing: "Pause"
-        case .finished: "Play again"
-        case .idle, .paused: "Play"
+        case .playing: String(localized: "Pause")
+        case .finished: String(localized: "Play again")
+        case .idle, .paused: String(localized: "Play")
         }
     }
 }

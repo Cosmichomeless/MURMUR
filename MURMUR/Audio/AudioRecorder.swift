@@ -9,11 +9,11 @@ enum AudioRecorderError: Error, Equatable, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .configurationChanged: "The audio input changed."
-        case .alreadyRecording: "A recording is already in progress."
-        case .notRecording: "There is no recording in progress."
-        case .invalidInputFormat: "The microphone is not available."
-        case .noAudioCaptured: "No audio was captured."
+        case .configurationChanged: String(localized: "The audio input changed.")
+        case .alreadyRecording: String(localized: "A recording is already in progress.")
+        case .notRecording: String(localized: "There is no recording in progress.")
+        case .invalidInputFormat: String(localized: "The microphone is not available.")
+        case .noAudioCaptured: String(localized: "No audio was captured.")
         }
     }
 }

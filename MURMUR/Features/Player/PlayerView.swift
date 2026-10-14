@@ -12,6 +12,7 @@ struct PlayerView: View {
     /// The position being dragged to. While set, it wins over the player's own position.
     @State private var scrubTime: TimeInterval?
     @State private var isEditingDetails = false
+    @State private var sharing = ShareCoordinator()
 
     private var shownTime: TimeInterval { scrubTime ?? model.currentTime }
     private var shownProgress: Double {
@@ -80,11 +81,22 @@ struct PlayerView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Menu {
+                    ForEach(ShareChoice.allCases) { choice in
+                        Button(choice.title, systemImage: choice.symbol) {
+                            sharing.share([recording], choice: choice, fileStore: repository.fileStore)
+                        }
+                    }
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                .accessibilityIdentifier("player.share")
                 Button("Edit details", systemImage: "pencil") { isEditingDetails = true }
                     .accessibilityIdentifier("player.edit")
             }
         }
+        .shareSheet(sharing)
         .sheet(isPresented: $isEditingDetails) {
             RecordingDetailsSheet(recording: recording, repository: repository)
         }

@@ -1807,6 +1807,40 @@
         }
       }
     },
+    "Record a note": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notiz aufnehmen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grabar una nota"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer une note"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra una nota"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gravar uma nota"
+          }
+        }
+      }
+    },
     "Recording": {
       "localizations": {
         "de": {
@@ -2283,6 +2317,40 @@
         }
       }
     },
+    "Starts recording a voice note in MURMUR.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startet die Aufnahme einer Sprachnotiz in MURMUR."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empieza a grabar una nota de voz en MURMUR."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lance l'enregistrement d'une note vocale dans MURMUR."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia la registrazione di una nota vocale in MURMUR."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia a gravação de uma nota de voz no MURMUR."
+          }
+        }
+      }
+    },
     "Stop and save": {
       "localizations": {
         "de": {
@@ -2313,6 +2381,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Parar e salvar"
+          }
+        }
+      }
+    },
+    "Stops the recording in progress and saves it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beendet die laufende Aufnahme und sichert sie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detiene la grabación en curso y la guarda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrête l'enregistrement en cours et le sauvegarde."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompe la registrazione in corso e la salva."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para a gravação em andamento e a salva."
           }
         }
       }

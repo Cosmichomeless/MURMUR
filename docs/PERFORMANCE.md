@@ -85,6 +85,34 @@ waveform, and `bufferingNewest(32)` bounds the backlog if the main actor ever fa
 Both draw with a single `Canvas` pass instead of one view per bar, and the live waveform has its
 own observable so only that view redraws at 20 Hz, not the whole recorder screen.
 
+## Quick capture: tap to first audio
+
+[Quick capture](ARCHITECTURE.md#quick-capture-widgets-action-button-and-live-activity) (widget,
+Action Button, Control Center, Shortcuts) exists to make starting a note fast, so the time from the
+tap to the first captured audio is logged on every recording that starts that way.
+
+**Where it is logged.** Unified logging, subsystem `com.cosmichomeless.murmur`, category
+`quick-capture`, once per recording, when the first audio sample arrives. Two figures:
+
+- *since the request*: from the moment the intent ran (or the record button was tapped) to the
+  first sample. This is the figure that measures the app's own work: permission check, audio
+  session activation, engine start.
+- *since process start*: from the launch of the app process (read with `sysctl`). When the intent
+  launches a cold app, this also includes the part of the launch that happened before any of the
+  app's code could run.
+
+**How to read it on a device.** Connect the iPhone, open Console.app, select it, filter by
+`subsystem:com.cosmichomeless.murmur category:quick-capture`, and trigger the capture from the
+Action Button, the Lock Screen widget and the in-app button. Repeat with the app cold (swiped
+away) and warm (in the background) — the two differ a lot — at least ten times each, and report the
+median and the worst case.
+
+**What is known.** The measurement is covered by unit tests (it is set by the first sample, is
+`nil` before it, is not overwritten by later samples and restarts with each recording). **No
+figures from a physical device exist yet**, and a simulator number would say nothing about the
+Action Button path, so none is quoted here. The time the system takes to launch the app before the
+intent runs is outside the "since the request" figure by construction.
+
 ## What the numbers mean for the design
 
 - **Bounded by construction, then verified.** The ring buffer (fixed capacity) and the
@@ -99,4 +127,5 @@ own observable so only that view redraws at 20 Hz, not the whole recorder screen
 
 - Real-device CPU, energy and thermal behaviour during a multi-hour recording (needs Instruments on
   hardware).
+- Tap-to-first-audio on a real iPhone, cold and warm, from each quick-capture entry point.
 - Disk-full and low-memory behaviour beyond what the error paths already handle.

@@ -47,6 +47,7 @@ struct MURMURApp: App {
             access: access,
             recorder: services.recorder,
             events: events,
+            activity: services.activity,
             save: { audio in
                 let recording = try repository.save(
                     temporaryURL: audio.fileURL,

@@ -10,6 +10,8 @@ struct AppServices {
     let session: any AudioSessionControlling
     let recorder: any AudioRecording
     let speech: any SpeechEngine
+    /// The Live Activity of a recording in progress.
+    let activity: (any RecordingActivityControlling)?
     /// Fills the library before the first screen. `nil` in a normal launch.
     let seedLibrary: ((RecordingRepository) throws -> Void)?
 
@@ -24,6 +26,7 @@ struct AppServices {
                 session: DemoSession(playback: AudioSessionManager()),
                 recorder: DemoRecorder(store: store),
                 speech: DemoSpeechEngine(),
+                activity: RecordingActivityController(),
                 seedLibrary: seed
             )
         }
@@ -38,6 +41,7 @@ struct AppServices {
                 removeFile: { fileStore.removeTemporary(at: $0) }
             ),
             speech: AppleSpeechEngine(),
+            activity: RecordingActivityController(),
             seedLibrary: nil
         )
     }

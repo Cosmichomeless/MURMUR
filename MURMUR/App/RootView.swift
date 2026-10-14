@@ -16,6 +16,12 @@ struct RootView: View {
             player: player
         )
             .task { transcription.resumePending() }
+            .task {
+                // The Action Button, the widgets and the Live Activity reach the recorder from here.
+                QuickCaptureCoordinator.shared.attach { command, instant in
+                    recorder.handle(command, requestedAt: instant) { player.stop() }
+                }
+            }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     microphoneAccess.refresh()

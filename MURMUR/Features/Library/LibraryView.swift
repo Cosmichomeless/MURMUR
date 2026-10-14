@@ -104,6 +104,13 @@ struct LibraryView: View {
             .sheet(isPresented: $isRecording) {
                 RecorderSheet(model: recorder, access: microphoneAccess)
             }
+            // A recording started from outside (Action Button, widget) brings the recorder up.
+            .onChange(of: recorder.state.isCapturing) { _, capturing in
+                guard capturing else { return }
+                isShowingSettings = false
+                editing = nil
+                isRecording = true
+            }
         }
         #if DEBUG
         .task { await openDemoScreen() }

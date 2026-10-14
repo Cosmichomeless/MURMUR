@@ -7,6 +7,7 @@ struct MURMURApp: App {
     @State private var microphoneAccess: MicrophoneAccess
     @State private var recorder: RecorderViewModel
     @State private var player: PlayerViewModel
+    @State private var transcription: TranscriptionService
     private let repository: RecordingRepository
 
     init() {
@@ -30,6 +31,13 @@ struct MURMURApp: App {
         self.repository = repository
         try? services.seedLibrary?(repository)
 
+        let transcription = TranscriptionService(
+            engine: services.speech,
+            repository: repository,
+            settings: TranscriptionSettings()
+        )
+        _transcription = State(initialValue: transcription)
+
         let session = services.session
         let access = MicrophoneAccess(session: session)
         let events = AudioSessionEvents()
@@ -40,11 +48,12 @@ struct MURMURApp: App {
             recorder: services.recorder,
             events: events,
             save: { audio in
-                try repository.save(
+                let recording = try repository.save(
                     temporaryURL: audio.fileURL,
                     duration: audio.duration,
                     waveform: audio.waveform
                 )
+                transcription.transcribeAfterSave(recording)
             }
         ))
     }
@@ -57,6 +66,7 @@ struct MURMURApp: App {
                 repository: repository,
                 player: player
             )
+            .environment(transcription)
         }
         .modelContainer(container)
     }

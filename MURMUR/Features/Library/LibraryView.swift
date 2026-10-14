@@ -10,6 +10,7 @@ struct LibraryView: View {
 
     @Query(Recording.newestFirst()) private var recordings: [Recording]
     @State private var isRecording = false
+    @State private var isShowingSettings = false
     @State private var path: [Recording] = []
     @State private var pendingDeletion: Recording?
     @State private var deletionMessage: String?
@@ -33,10 +34,18 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("MURMUR")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Settings", systemImage: "gearshape") { isShowingSettings = true }
+                        .accessibilityIdentifier("library.settings")
+                }
+            }
+            .sheet(isPresented: $isShowingSettings) { SettingsView() }
             .navigationDestination(for: Recording.self) { recording in
                 PlayerView(
                     recording: recording,
                     fileURL: recording.fileURL(in: repository.fileStore),
+                    repository: repository,
                     model: player
                 )
             }

@@ -4,6 +4,8 @@ struct RecordingRow: View {
     let recording: Recording
     /// What a search found in the transcript, shown under the title.
     var moment: RecordingSearchResult.Moment?
+    /// `false` when the note came from iCloud and its audio has not been downloaded yet.
+    var audioAvailable = true
 
     var body: some View {
         HStack(spacing: Brand.Spacing.medium) {
@@ -41,6 +43,12 @@ struct RecordingRow: View {
                 Text(DurationFormat.clock(recording.duration))
                     .font(.subheadline.monospacedDigit())
                     .foregroundStyle(.secondary)
+                if !audioAvailable {
+                    Image(systemName: "icloud.and.arrow.down")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                }
                 if let time = moment?.time {
                     Label(DurationFormat.clock(time), systemImage: "play.circle.fill")
                         .font(.caption.monospacedDigit())
@@ -58,6 +66,7 @@ struct RecordingRow: View {
         var parts = ["\(DurationFormat.clock(recording.duration)), \(recording.createdAt.formatted(date: .abbreviated, time: .shortened))"]
         if !recording.tags.isEmpty { parts.append(recording.tags.joined(separator: ", ")) }
         if let moment { parts.append(moment.snippet) }
+        if !audioAvailable { parts.append(String(localized: "Audio not downloaded yet")) }
         return parts.joined(separator: ". ")
     }
 }

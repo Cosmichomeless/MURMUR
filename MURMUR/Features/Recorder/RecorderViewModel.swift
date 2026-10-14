@@ -11,33 +11,41 @@ final class RecorderViewModel {
     private(set) var savedCount = 0
     /// A non-blocking message, e.g. when a failure still left a usable recording.
     private(set) var notice: String?
+    /// How long the last recording took from the request to start until its first audio, once it came.
+    private(set) var startLatency: Duration?
 
     /// Separate observable: only the waveform view redraws at the sample rate.
     @ObservationIgnored let waveform: LiveWaveform
     @ObservationIgnored private let access: MicrophoneAccess
     @ObservationIgnored private let recorder: any AudioRecording
     @ObservationIgnored private let save: (RecordedAudio) throws -> Void
+    @ObservationIgnored private let activity: (any RecordingActivityControlling)?
+    @ObservationIgnored private var requestedAt: ContinuousClock.Instant?
     @ObservationIgnored private var consumer: Task<Void, Never>?
     @ObservationIgnored private var eventObserver: Task<Void, Never>?
 
     /// - Parameters:
     ///   - events: Session interruptions and route changes. Without it the recorder ignores them.
+    ///   - activity: Shows the recording on the Lock Screen and in the Dynamic Island.
     ///   - save: Takes ownership of a finished recording (moves the temporary file somewhere permanent).
     init(
         access: MicrophoneAccess,
         recorder: any AudioRecording,
         waveform: LiveWaveform = LiveWaveform(),
         events: (any AudioSessionEventSource)? = nil,
+        activity: (any RecordingActivityControlling)? = nil,
         save: @escaping (RecordedAudio) throws -> Void
     ) {
         self.waveform = waveform
         self.access = access
         self.recorder = recorder
         self.save = save
+        self.activity = activity
         if let events { observe(events) }
     }
 
-    func start() async {
+    /// - Parameter requestedAt: When the user asked to record, to measure the time to the first audio.
+    func start(requestedAt: ContinuousClock.Instant = .now) async {
         guard state == .idle || isFailed else { return }
         guard await access.prepareForRecording() else { return }
         // The permission prompt suspends: another start may have won in the meantime.
@@ -49,6 +57,9 @@ final class RecorderViewModel {
             elapsed = 0
             waveform.reset()
             notice = nil
+            startLatency = nil
+            self.requestedAt = requestedAt
+            activity?.recordingStarted()
             consume(samples)
         } catch {
             access.releaseSession()
@@ -60,6 +71,7 @@ final class RecorderViewModel {
         guard let next = state.applying(.pause) else { return }
         recorder.pause()
         state = next
+        activity?.recordingPaused(elapsed: elapsed)
     }
 
     func resume() {
@@ -70,6 +82,7 @@ final class RecorderViewModel {
             try recorder.resume()
             state = next
             notice = nil
+            activity?.recordingResumed(elapsed: elapsed)
         } catch {
             keepCapturedAudio(because: error.localizedDescription)
         }
@@ -88,7 +101,10 @@ final class RecorderViewModel {
     func stop() {
         guard let next = state.applying(.stop) else { return }
         stopConsuming()
-        defer { access.releaseSession() }
+        defer {
+            access.releaseSession()
+            activity?.recordingEnded()
+        }
         do {
             let audio = try recorder.stop()
             try save(audio)
@@ -106,6 +122,7 @@ final class RecorderViewModel {
         stopConsuming()
         recorder.discard()
         access.releaseSession()
+        activity?.recordingEnded()
         state = next
         elapsed = 0
     }
@@ -162,10 +179,16 @@ final class RecorderViewModel {
         guard state == .recording, let next = state.applying(.pause) else { return }
         recorder.pause()
         state = next
+        activity?.recordingPaused(elapsed: elapsed)
         notice = String(localized: "Paused because another app took the microphone. Tap resume to continue.")
     }
 
     private func apply(_ sample: RecorderSample) {
+        if startLatency == nil, let requestedAt {
+            let latency = requestedAt.duration(to: .now)
+            startLatency = latency
+            StartLatency.report(sinceRequest: latency)
+        }
         waveform.append(sample.level)
         // Only publish when the displayed tenth of a second changes: fewer view updates.
         guard Int(sample.duration * 10) != Int(elapsed * 10) else { return }
@@ -177,7 +200,10 @@ final class RecorderViewModel {
     private func keepCapturedAudio(because reason: String) {
         guard state.isCapturing else { return }
         stopConsuming()
-        defer { access.releaseSession() }
+        defer {
+            access.releaseSession()
+            activity?.recordingEnded()
+        }
         do {
             let audio = try recorder.stop()
             try save(audio)
@@ -192,5 +218,29 @@ final class RecorderViewModel {
     private func stopConsuming() {
         consumer?.cancel()
         consumer = nil
+    }
+}
+
+extension RecorderViewModel {
+    /// Carries out what an intent, a widget or the Live Activity asked for.
+    ///
+    /// - Parameter beforeStart: Runs only when a recording is really going to start, for example to
+    ///   stop playback, which needs a different audio session.
+    /// - Returns: The task that starts the recording, `nil` when nothing needs to start.
+    @discardableResult
+    func handle(
+        _ command: QuickCaptureCommand,
+        requestedAt instant: ContinuousClock.Instant,
+        beforeStart: () -> Void = {}
+    ) -> Task<Void, Never>? {
+        switch command {
+        case .start:
+            guard !state.isCapturing else { return nil }
+            beforeStart()
+            return Task { await start(requestedAt: instant) }
+        case .stop:
+            stop()
+            return nil
+        }
     }
 }

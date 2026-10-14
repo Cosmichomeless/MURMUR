@@ -20,19 +20,121 @@ struct LibraryView: View {
     @State private var editMode: EditMode = .inactive
     @State private var selection = Set<Recording.ID>()
     @State private var sharing = ShareCoordinator()
+    @State private var columnVisibility = NavigationSplitViewVisibility.doubleColumn
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(SyncSettings.self) private var sync
 
     private var isSelecting: Bool { editMode.isEditing }
+    /// iPad (and any regular width): the list beside the player. iPhone and narrow windows: a stack.
+    private var usesSplitView: Bool { horizontalSizeClass == .regular }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            Group {
-                if recordings.isEmpty {
-                    EmptyLibraryView()
-                } else {
-                    resultsList
-                }
+        Group {
+            if usesSplitView {
+                splitLayout
+            } else {
+                stackLayout
             }
+        }
+        .shareSheet(sharing)
+        .sheet(isPresented: $isShowingSettings) { SettingsView() }
+        .sheet(item: $editing) { recording in
+            RecordingDetailsSheet(recording: recording, repository: repository)
+        }
+        .confirmationDialog(
+            "Delete this recording?",
+            isPresented: Binding(
+                get: { pendingDeletion != nil },
+                set: { if !$0 { pendingDeletion = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: pendingDeletion
+        ) { recording in
+            Button("Delete \"\(recording.title)\"", role: .destructive) { delete(recording) }
+        } message: { _ in
+            Text("The audio file will be removed from this device. This can't be undone.")
+        }
+        .alert("Couldn't delete", isPresented: Binding(
+            get: { deletionMessage != nil },
+            set: { if !$0 { deletionMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deletionMessage ?? "")
+        }
+        .sheet(isPresented: $isRecording) {
+            RecorderSheet(model: recorder, access: microphoneAccess)
+        }
+        // A recording started from outside (Action Button, widget) brings the recorder up.
+        .onChange(of: recorder.state.isCapturing) { _, capturing in
+            guard capturing else { return }
+            isShowingSettings = false
+            editing = nil
+            isRecording = true
+        }
+        #if DEBUG
+        .task { await openDemoScreen() }
+        #endif
+    }
+
+    private var stackLayout: some View {
+        NavigationStack(path: $path) {
+            sidebar
+                .navigationDestination(for: PlayerRoute.self) { route in
+                    PlayerView(
+                        recording: route.recording,
+                        fileURL: route.recording.fileURL(in: repository.fileStore),
+                        startTime: route.startTime,
+                        repository: repository,
+                        model: player
+                    )
+                }
+        }
+    }
+
+    private var splitLayout: some View {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            sidebar
+        } detail: {
+            detail
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+
+    /// The note picked in the list, shown beside it. Only outside selection mode, where a tap means "open".
+    @ViewBuilder
+    private var detail: some View {
+        if !isSelecting, selection.count == 1, let id = selection.first,
+           let recording = recordings.first(where: { $0.id == id }) {
+            PlayerView(
+                recording: recording,
+                fileURL: recording.fileURL(in: repository.fileStore),
+                startTime: results.first(where: { $0.id == id })?.moment?.time,
+                repository: repository,
+                model: player
+            )
+            .id(id)
+        } else {
+            ContentUnavailableView(
+                "Select a note",
+                systemImage: "waveform",
+                description: Text("Pick a note from the list to play it.")
+            )
+        }
+    }
+
+    /// The library: search, the list of notes and the record button.
+    private var sidebar: some View {
+        Group {
+            if recordings.isEmpty {
+                EmptyLibraryView()
+            } else {
+                resultsList
+            }
+        }
             .navigationTitle("MURMUR")
+            .navigationBarTitleDisplayMode(usesSplitView ? .large : .automatic)
+            .navigationSplitViewColumnWidth(min: 340, ideal: 400, max: 480)
             .searchable(text: $searchText, prompt: "Search titles, tags and transcripts")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -49,21 +151,9 @@ struct LibraryView: View {
                 }
             }
             .environment(\.editMode, $editMode)
-            .onChange(of: editMode) { if !isSelecting { selection.removeAll() } }
-            .shareSheet(sharing)
-            .sheet(isPresented: $isShowingSettings) { SettingsView() }
-            .sheet(item: $editing) { recording in
-                RecordingDetailsSheet(recording: recording, repository: repository)
-            }
-            .navigationDestination(for: PlayerRoute.self) { route in
-                PlayerView(
-                    recording: route.recording,
-                    fileURL: route.recording.fileURL(in: repository.fileStore),
-                    startTime: route.startTime,
-                    repository: repository,
-                    model: player
-                )
-            }
+            // Entering or leaving selection mode starts from nothing picked: the one note that was
+            // open beside the list must not count as "selected to share".
+            .onChange(of: editMode) { selection.removeAll() }
             .safeAreaInset(edge: .bottom) {
                 if isSelecting {
                     selectionBar
@@ -80,34 +170,6 @@ struct LibraryView: View {
                     .padding(.bottom, Brand.Spacing.small)
                 }
             }
-            .confirmationDialog(
-                "Delete this recording?",
-                isPresented: Binding(
-                    get: { pendingDeletion != nil },
-                    set: { if !$0 { pendingDeletion = nil } }
-                ),
-                titleVisibility: .visible,
-                presenting: pendingDeletion
-            ) { recording in
-                Button("Delete \"\(recording.title)\"", role: .destructive) { delete(recording) }
-            } message: { _ in
-                Text("The audio file will be removed from this device. This can't be undone.")
-            }
-            .alert("Couldn't delete", isPresented: Binding(
-                get: { deletionMessage != nil },
-                set: { if !$0 { deletionMessage = nil } }
-            )) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(deletionMessage ?? "")
-            }
-            .sheet(isPresented: $isRecording) {
-                RecorderSheet(model: recorder, access: microphoneAccess)
-            }
-        }
-        #if DEBUG
-        .task { await openDemoScreen() }
-        #endif
     }
 }
 
@@ -125,7 +187,11 @@ extension LibraryView {
             await recorder.start()
         case .player:
             guard let recording = recordings.first(where: { $0.title == DemoLibrary.playerTitle }) else { return }
-            path = [PlayerRoute(recording: recording)]
+            if usesSplitView {
+                selection = [recording.id]
+            } else {
+                path = [PlayerRoute(recording: recording)]
+            }
             try? await Task.sleep(for: .milliseconds(800))
             // Paused partway through, so every capture shows the same frame.
             player.seek(to: recording.duration * 0.35)
@@ -156,9 +222,7 @@ extension LibraryView {
                     .listRowSeparator(.hidden)
             }
             ForEach(shown) { result in
-                NavigationLink(value: PlayerRoute(recording: result.recording, startTime: result.moment?.time)) {
-                    RecordingRow(recording: result.recording, moment: result.moment)
-                }
+                row(for: result)
                 .swipeActions(edge: .leading) {
                     Button("Edit", systemImage: "pencil") { editing = result.recording }
                         .tint(Brand.coral)
@@ -173,6 +237,25 @@ extension LibraryView {
         .overlay {
             if shown.isEmpty, isFiltering {
                 ContentUnavailableView.search(text: searchText)
+            }
+        }
+    }
+
+    /// A tap opens the note: pushed onto the stack, or selected so the detail column shows it.
+    @ViewBuilder
+    private func row(for result: RecordingSearchResult) -> some View {
+        // Reading the revision makes the row refresh when audio arrives from iCloud.
+        let _ = sync.audioRevision
+        let content = RecordingRow(
+            recording: result.recording,
+            moment: result.moment,
+            audioAvailable: repository.fileStore.exists(fileName: result.recording.fileName)
+        )
+        if usesSplitView {
+            content.tag(result.id)
+        } else {
+            NavigationLink(value: PlayerRoute(recording: result.recording, startTime: result.moment?.time)) {
+                content
             }
         }
     }
@@ -205,7 +288,9 @@ extension LibraryView {
     private func delete(_ recording: Recording) {
         do {
             // A leftover file (`.fileLeftBehind`) is invisible to the user and swept at next launch.
+            let id = recording.id
             try repository.delete(recording)
+            selection.remove(id)
         } catch {
             deletionMessage = error.localizedDescription
         }

@@ -9,6 +9,8 @@ import SwiftData
 struct RecordingRepository {
     let context: ModelContext
     let fileStore: RecordingFileStore
+    /// Told about audio files appearing and disappearing, when iCloud sync is on.
+    var audioSync: (any AudioSyncing)?
 
     /// Moves a finished capture into the recordings folder and stores its metadata.
     @discardableResult
@@ -35,6 +37,7 @@ struct RecordingRepository {
             try? fileStore.remove(fileName: fileName)
             throw error
         }
+        audioSync?.audioAdded(fileName: fileName)
         return recording
     }
 
@@ -53,6 +56,7 @@ struct RecordingRepository {
             context.rollback()
             throw error
         }
+        audioSync?.audioRemoved(fileName: fileName)
 
         do {
             try fileStore.remove(fileName: fileName)

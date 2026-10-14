@@ -49,19 +49,45 @@ Rules:
 MURMUR/
 ├── App/              app entry point, dependency container, root navigation
 ├── Audio/            session, recorder, player, waveform math (no UI, no SwiftData)
-├── Persistence/      SwiftData model, file store, repository, launch reconciler
+├── Persistence/      SwiftData model (schema V4), file store, repository, launch reconciler
+├── Sync/             optional iCloud: settings, audio sync rules, CloudKit audio channel
 ├── Design/           brand tokens (colors, spacing, shadow) and button styles
 ├── Features/
 │   ├── Library/      recordings list, empty state, record button
 │   ├── Recorder/     recorder screen, view model, microphone access
 │   ├── Player/       player screen + view model
 │   └── Waveform/     live and static waveform views
+MURMURShared/         code compiled into both the app and the widget extension (intents, activity attributes)
+MURMURWidgets/        widget extension: Home/Lock Screen widget, Control Center control, Live Activity
 MURMURTests/          Swift Testing unit tests, grouped like the sources, plus Support/ fakes
 docs/                 product, architecture, audio, persistence, performance, demo and release documents
 ```
 
 The Xcode project uses synchronized folders: a file added under `MURMUR/` or `MURMURTests/` joins
 its target automatically.
+
+## Quick capture: widgets, Action Button and Live Activity
+
+Starting a note should take one tap from anywhere, so the app exposes the same two commands to the
+system in several ways.
+
+- **`RecordNoteIntent`** (App Intent, `openAppWhenRun`) starts a recording. It is offered as an App
+  Shortcut, so it can be bound to the Action Button, run from Siri or Spotlight, put in a Home or
+  Lock Screen widget and added as a Control Center control (iOS 18).
+- **`StopRecordingIntent`** (`LiveActivityIntent`) is the stop button of the Live Activity.
+- Both live in `MURMURShared/` and only send a `QuickCaptureCommand` to
+  `QuickCaptureCoordinator.shared`; they know nothing about audio. The root view attaches a handler
+  that calls `RecorderViewModel.handle(_:requestedAt:beforeStart:)`.
+- A command that arrives before the handler is attached (cold launch) is kept and delivered on
+  attach, unless it is older than 15 s: a recording must never start long after the tap that asked
+  for it.
+- **Live Activity.** `RecorderViewModel` reports start, pause, resume and end through
+  `RecordingActivityControlling`; the ActivityKit implementation shows the clock with
+  `Text(…, style: .timer)`, so the system keeps it ticking without the app updating it every
+  second, and shows the stop button on the Lock Screen and in the Dynamic Island. Orphaned
+  activities from a previous run are ended at start.
+- **Widgets are separate processes.** The extension cannot touch the recorder, which is why
+  everything goes through intents and the shared command type.
 
 ## Audio pipeline
 
@@ -130,6 +156,10 @@ controls update on their own cadence.
 SwiftData stores metadata; the audio file lives in the file system. They are kept consistent by the
 repository using a defined order of operations and a launch-time reconciliation. Details and the
 file locations are in [PERSISTENCE.md](PERSISTENCE.md).
+
+With iCloud on (optional, off by default) metadata is mirrored by SwiftData and audio travels
+through `Sync/CloudKitAudioSync`; the repository only talks to the `AudioSyncing` protocol, so the
+rest of the app does not import CloudKit. Conflict rules are in PERSISTENCE.md.
 
 ## Error handling
 

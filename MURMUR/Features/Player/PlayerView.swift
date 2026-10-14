@@ -9,9 +9,12 @@ struct PlayerView: View {
     let repository: RecordingRepository
     let model: PlayerViewModel
 
+    @Environment(SyncSettings.self) private var sync
     /// The position being dragged to. While set, it wins over the player's own position.
     @State private var scrubTime: TimeInterval?
     @State private var isEditingDetails = false
+    /// Whether this view already loaded its audio, so audio arriving for other notes doesn't reload it.
+    @State private var didLoad = false
     @State private var sharing = ShareCoordinator()
 
     private var shownTime: TimeInterval { scrubTime ?? model.currentTime }
@@ -61,7 +64,13 @@ struct PlayerView: View {
             .disabled(!model.isLoaded)
             .accessibilityLabel(playbackLabel)
 
-            if let message = model.errorMessage {
+            if !audioAvailable {
+                Label("This note's audio hasn't downloaded from iCloud yet.", systemImage: "icloud.and.arrow.down")
+                    .font(.footnote)
+                    .foregroundStyle(Brand.onGradientSecondary)
+                    .multilineTextAlignment(.center)
+                    .accessibilityIdentifier("player.audioMissing")
+            } else if let message = model.errorMessage {
                 Label(message, systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote)
                     .symbolRenderingMode(.multicolor)
@@ -74,6 +83,8 @@ struct PlayerView: View {
             .scrollBounceBehavior(.basedOnSize)
         }
         .padding()
+        // Keeps the controls a readable width on a wide screen instead of stretching them.
+        .frame(maxWidth: 640)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .brandScreen()
         .navigationTitle(recording.title)
@@ -100,11 +111,18 @@ struct PlayerView: View {
         .sheet(isPresented: $isEditingDetails) {
             RecordingDetailsSheet(recording: recording, repository: repository)
         }
-        .onAppear {
+        // Also runs again when audio arrives from iCloud while the note is open.
+        .task(id: sync.audioRevision) {
+            guard audioAvailable, !didLoad else { return }
+            didLoad = true
             model.load(url: fileURL)
             if let startTime { model.seek(to: startTime) }
         }
         .onDisappear { model.stop() }
+    }
+
+    private var audioAvailable: Bool {
+        repository.fileStore.exists(fileName: recording.fileName)
     }
 
     private var playbackSymbol: String {

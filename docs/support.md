@@ -14,7 +14,7 @@ MURMUR is a private voice recorder: it records, transcribes on your device and k
 
 **How do I get my notes out?** Open a note and tap Share, or tap Select in the library to share several. You can send the audio (.m4a), the transcript (.txt or .md), or both.
 
-**Is anything uploaded?** No. See the [privacy policy](privacy.md).
+**Is anything uploaded?** No, unless you turn on Sync with iCloud in Settings. Then your notes go to your own private iCloud, never to us, and appear on your other devices. A note can show a cloud icon while its audio is still downloading. See the [privacy policy](privacy.md).
 
 **How do I delete a note?** Swipe it in the library or use Delete in the note. Uninstalling the app removes everything.
 
@@ -38,7 +38,7 @@ MURMUR es una grabadora de voz privada: graba, transcribe en tu dispositivo y lo
 
 **¿Cómo saco mis notas?** Abre una nota y toca Compartir, o toca Seleccionar en la biblioteca para compartir varias. Puedes enviar el audio (.m4a), la transcripción (.txt o .md), o ambos.
 
-**¿Se sube algo?** No. Consulta la [política de privacidad](privacy.md).
+**¿Se sube algo?** No, salvo que actives Sincronizar con iCloud en Ajustes. Entonces tus notas van a tu propio iCloud privado, nunca a nosotros, y aparecen en tus otros dispositivos. Una nota puede mostrar un icono de nube mientras se descarga su audio. Consulta la [política de privacidad](privacy.md).
 
 **¿Cómo borro una nota?** Desliza en la biblioteca o usa Eliminar dentro de la nota. Desinstalar la app lo elimina todo.
 

@@ -376,6 +376,40 @@
         }
       }
     },
+    "Audio not downloaded yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio noch nicht geladen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio aún sin descargar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio pas encore téléchargé"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio non ancora scaricato"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Áudio ainda não transferido"
+          }
+        }
+      }
+    },
     "Audio services were reset. Open the recording again.": {
       "localizations": {
         "de": {
@@ -1158,6 +1192,40 @@
         }
       }
     },
+    "Keeps your notes, transcripts and audio on all your devices through your own private iCloud. Nothing goes to MURMUR's servers, and it is off unless you turn it on.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hält deine Notizen, Transkripte und Audioaufnahmen über dein privates iCloud auf allen deinen Geräten bereit. Nichts gelangt auf die Server von MURMUR, und die Funktion ist aus, bis du sie aktivierst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantiene tus notas, transcripciones y audio en todos tus dispositivos a través de tu iCloud privado. Nada llega a los servidores de MURMUR y está desactivado salvo que lo actives."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garde vos notes, transcriptions et enregistrements audio sur tous vos appareils via votre iCloud privé. Rien n'est envoyé aux serveurs de MURMUR, et la fonction reste désactivée tant que vous ne l'activez pas."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantiene note, trascrizioni e audio su tutti i tuoi dispositivi tramite il tuo iCloud privato. Nulla arriva ai server di MURMUR e la funzione è disattivata finché non la attivi."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantém as suas notas, transcrições e áudio em todos os seus dispositivos através do seu iCloud privado. Nada vai para os servidores do MURMUR e a função está desativada até a ativar."
+          }
+        }
+      }
+    },
     "Language": {
       "localizations": {
         "de": {
@@ -1637,6 +1705,40 @@
         }
       }
     },
+    "Pick a note from the list to play it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle eine Notiz aus der Liste, um sie abzuspielen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige una nota de la lista para reproducirla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez une note dans la liste pour l’écouter."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli una nota dall’elenco per riprodurla."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha uma nota da lista para reproduzi-la."
+          }
+        }
+      }
+    },
     "Play": {
       "localizations": {
         "de": {
@@ -1807,6 +1909,40 @@
         }
       }
     },
+    "Record a note": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notiz aufnehmen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grabar una nota"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer une note"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra una nota"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gravar uma nota"
+          }
+        }
+      }
+    },
     "Recording": {
       "localizations": {
         "de": {
@@ -1939,6 +2075,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "A gravação parou antes do tempo (%@). O que foi capturado foi salvo."
+          }
+        }
+      }
+    },
+    "Restart MURMUR to apply this change.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starte MURMUR neu, um diese Änderung anzuwenden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reinicia MURMUR para aplicar este cambio."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relancez MURMUR pour appliquer ce changement."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riavvia MURMUR per applicare questa modifica."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reinicie o MURMUR para aplicar esta alteração."
           }
         }
       }
@@ -2113,6 +2283,40 @@
         }
       }
     },
+    "Select a note": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notiz auswählen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona una nota"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélectionnez une note"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona una nota"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione uma nota"
+          }
+        }
+      }
+    },
     "Select notes to share": {
       "localizations": {
         "de": {
@@ -2215,6 +2419,40 @@
         }
       }
     },
+    "Sign in to iCloud in the Settings app to sync.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melde dich in den Einstellungen bei iCloud an, um zu synchronisieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia sesión en iCloud en Ajustes para sincronizar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connectez-vous à iCloud dans Réglages pour synchroniser."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accedi a iCloud in Impostazioni per sincronizzare."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicie sessão no iCloud nos Ajustes para sincronizar."
+          }
+        }
+      }
+    },
     "Speech recognition is turned off for MURMUR. Allow it in Settings to get a transcript.": {
       "localizations": {
         "de": {
@@ -2283,6 +2521,40 @@
         }
       }
     },
+    "Starts recording a voice note in MURMUR.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startet die Aufnahme einer Sprachnotiz in MURMUR."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empieza a grabar una nota de voz en MURMUR."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lance l'enregistrement d'une note vocale dans MURMUR."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia la registrazione di una nota vocale in MURMUR."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia a gravação de uma nota de voz no MURMUR."
+          }
+        }
+      }
+    },
     "Stop and save": {
       "localizations": {
         "de": {
@@ -2317,6 +2589,40 @@
         }
       }
     },
+    "Stops the recording in progress and saves it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beendet die laufende Aufnahme und sichert sie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detiene la grabación en curso y la guarda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrête l'enregistrement en cours et le sauvegarde."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompe la registrazione in corso e la salva."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para a gravação em andamento e a salva."
+          }
+        }
+      }
+    },
     "Support": {
       "localizations": {
         "de": {
@@ -2347,6 +2653,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Suporte"
+          }
+        }
+      }
+    },
+    "Sync with iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit iCloud synchronisieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar con iCloud"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser avec iCloud"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza con iCloud"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar com o iCloud"
+          }
+        }
+      }
+    },
+    "Syncing with iCloud.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisierung mit iCloud."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizando con iCloud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation avec iCloud."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione con iCloud."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A sincronizar com o iCloud."
           }
         }
       }
@@ -2827,6 +3201,40 @@
         }
       }
     },
+    "This note's audio hasn't downloaded from iCloud yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Audio dieser Notiz wurde noch nicht aus iCloud geladen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El audio de esta nota aún no se ha descargado de iCloud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'audio de cette note n'a pas encore été téléchargé depuis iCloud."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'audio di questa nota non è ancora stato scaricato da iCloud."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O áudio desta nota ainda não foi transferido do iCloud."
+          }
+        }
+      }
+    },
     "Title": {
       "localizations": {
         "de": {
@@ -3269,6 +3677,40 @@
         }
       }
     },
+    "Your iCloud storage is full, so new audio can't be uploaded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein iCloud-Speicher ist voll, neue Audioaufnahmen können nicht hochgeladen werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu almacenamiento de iCloud está lleno, así que no se puede subir audio nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre stockage iCloud est plein : les nouveaux enregistrements ne peuvent pas être envoyés."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo spazio di iCloud è esaurito, quindi non è possibile caricare nuovo audio."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O armazenamento do iCloud está cheio, por isso não é possível enviar áudio novo."
+          }
+        }
+      }
+    },
     "Your tags": {
       "localizations": {
         "de": {
@@ -3333,6 +3775,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "os serviços de áudio foram reiniciados"
+          }
+        }
+      }
+    },
+    "iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        }
+      }
+    },
+    "iCloud isn't available right now. Your notes stay on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud ist gerade nicht verfügbar. Deine Notizen bleiben auf diesem Gerät."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud no está disponible ahora mismo. Tus notas se quedan en este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud n'est pas disponible pour le moment. Vos notes restent sur cet appareil."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud non è disponibile al momento. Le tue note restano su questo dispositivo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O iCloud não está disponível neste momento. As suas notas ficam neste dispositivo."
           }
         }
       }

@@ -16,6 +16,10 @@ version prepared for TestFlight and App Store review.
   and several notes at once from the library in selection mode.
 - **Spanish, French, German, Italian and Portuguese.** All interface strings and permission prompts
   are in a String Catalog.
+- **Quick capture.** Start a recording from App Intents, widgets, Control Center and a Live Activity.
+- **iPad.** Adaptive split-view layout, and iPad is a supported device.
+- **Optional iCloud sync.** Notes and audio can be mirrored to the user's private CloudKit database.
+  Off by default.
 - **App Review material.** Privacy manifest, privacy policy and support page, review notes in
   [APP_REVIEW.md](APP_REVIEW.md) and the store text in [app-store-listing.md](app-store-listing.md).
 

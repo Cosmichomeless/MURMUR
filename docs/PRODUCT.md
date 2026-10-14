@@ -44,7 +44,7 @@ it is not a separate product feature.
 
 ### Explicitly out of scope
 
-Accounts, backend, cloud sync, social features, AI transcription, advanced audio editing,
+Accounts, backend, any sync that is not the user's own optional iCloud (#38), social features, AI transcription, advanced audio editing,
 collaborative recordings and folder systems. Renaming, search, sharing/export and widgets are
 **post-MVP** and must not shape the MVP architecture.
 
@@ -186,7 +186,7 @@ MURMUR bets on (to verify by hand in the same iOS version before using any of it
   if a language is not available offline, the app says so.
 - **Six interface languages** (en, es, fr, de, it, pt).
 
-What MURMUR does not try to beat: sync across devices, a Mac app, or being preinstalled.
+What MURMUR does not try to beat: seamless sync (iCloud is optional and unproven at launch), a Mac app, or being preinstalled.
 
 ### Validation
 

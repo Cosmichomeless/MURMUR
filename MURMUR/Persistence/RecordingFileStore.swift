@@ -85,6 +85,12 @@ struct RecordingFileStore: Sendable {
 
     // MARK: - Inspection
 
+    /// When the file was last written, or `nil` if it does not exist.
+    func modificationDate(fileName: String) -> Date? {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL(for: fileName).path)
+        return attributes?[.modificationDate] as? Date
+    }
+
     /// Names of the audio files currently in `recordingsDirectory`.
     func storedFileNames() throws -> Set<String> {
         guard FileManager.default.fileExists(atPath: recordingsDirectory.path) else { return [] }

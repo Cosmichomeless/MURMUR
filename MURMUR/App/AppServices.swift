@@ -10,6 +10,8 @@ struct AppServices {
     let session: any AudioSessionControlling
     let recorder: any AudioRecording
     let speech: any SpeechEngine
+    /// The Live Activity of a recording in progress.
+    let activity: (any RecordingActivityControlling)?
     /// Fills the library before the first screen. `nil` in a normal launch.
     let seedLibrary: ((RecordingRepository) throws -> Void)?
 
@@ -24,11 +26,15 @@ struct AppServices {
                 session: DemoSession(playback: AudioSessionManager()),
                 recorder: DemoRecorder(store: store),
                 speech: DemoSpeechEngine(),
+                activity: RecordingActivityController(),
                 seedLibrary: seed
             )
         }
         #endif
         let fileStore = RecordingFileStore.default
+        // The unit tests run inside the app: ActivityKit has nothing to show there (and can stall on a
+        // headless CI machine), and the recorder tests use their own fake.
+        let underTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
         return AppServices(
             fileStore: fileStore,
             inMemory: false,
@@ -38,6 +44,7 @@ struct AppServices {
                 removeFile: { fileStore.removeTemporary(at: $0) }
             ),
             speech: AppleSpeechEngine(),
+            activity: underTest ? nil : RecordingActivityController(),
             seedLibrary: nil
         )
     }

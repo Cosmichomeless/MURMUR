@@ -56,4 +56,27 @@ struct SchemaMigrationTests {
 
         #expect(try migrated.mainContext.fetch(FetchDescriptor<Recording>()).first?.transcriptText == "ok")
     }
+
+    @Test func aVersionTwoStoreGainsTagsAndKeepsItsTranscript() throws {
+        let store = TestStore(); defer { store.cleanUp() }
+        let url = store.root.appendingPathComponent("v2.sqlite")
+        let id = UUID()
+        do {
+            let schema = Schema(versionedSchema: MurmurSchemaV2.self)
+            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url)])
+            let old = MurmurSchemaV2.Recording(id: id, title: "Transcribed", fileName: "t.m4a", duration: 9)
+            old.transcriptText = "hello there"
+            old.transcriptionStatusRaw = TranscriptionStatus.completed.rawValue
+            container.mainContext.insert(old)
+            try container.mainContext.save()
+        }
+
+        let migrated = try PersistenceController.makeContainer(storeURL: url)
+        let recording = try #require(try migrated.mainContext.fetch(FetchDescriptor<Recording>()).first)
+        #expect(recording.id == id)
+        #expect(recording.title == "Transcribed")
+        #expect(recording.transcriptText == "hello there")
+        #expect(recording.transcriptionStatus == .completed)
+        #expect(recording.tags.isEmpty)
+    }
 }

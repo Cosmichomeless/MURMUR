@@ -11,7 +11,10 @@ struct LibraryView: View {
     @Query(Recording.newestFirst()) private var recordings: [Recording]
     @State private var isRecording = false
     @State private var isShowingSettings = false
-    @State private var path: [Recording] = []
+    @State private var path: [PlayerRoute] = []
+    @State private var searchText = ""
+    @State private var selectedTag: String?
+    @State private var editing: Recording?
     @State private var pendingDeletion: Recording?
     @State private var deletionMessage: String?
 
@@ -21,19 +24,11 @@ struct LibraryView: View {
                 if recordings.isEmpty {
                     EmptyLibraryView()
                 } else {
-                    List(recordings) { recording in
-                        NavigationLink(value: recording) {
-                            RecordingRow(recording: recording)
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button("Delete", systemImage: "trash", role: .destructive) {
-                                pendingDeletion = recording
-                            }
-                        }
-                    }
+                    resultsList
                 }
             }
             .navigationTitle("MURMUR")
+            .searchable(text: $searchText, prompt: "Search titles, tags and transcripts")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Settings", systemImage: "gearshape") { isShowingSettings = true }
@@ -41,10 +36,14 @@ struct LibraryView: View {
                 }
             }
             .sheet(isPresented: $isShowingSettings) { SettingsView() }
-            .navigationDestination(for: Recording.self) { recording in
+            .sheet(item: $editing) { recording in
+                RecordingDetailsSheet(recording: recording, repository: repository)
+            }
+            .navigationDestination(for: PlayerRoute.self) { route in
                 PlayerView(
-                    recording: recording,
-                    fileURL: recording.fileURL(in: repository.fileStore),
+                    recording: route.recording,
+                    fileURL: route.recording.fileURL(in: repository.fileStore),
+                    startTime: route.startTime,
                     repository: repository,
                     model: player
                 )
@@ -106,7 +105,7 @@ extension LibraryView {
             await recorder.start()
         case .player:
             guard let recording = recordings.first(where: { $0.title == DemoLibrary.playerTitle }) else { return }
-            path = [recording]
+            path = [PlayerRoute(recording: recording)]
             try? await Task.sleep(for: .milliseconds(800))
             // Paused partway through, so every capture shows the same frame.
             player.seek(to: recording.duration * 0.35)
@@ -116,12 +115,90 @@ extension LibraryView {
 #endif
 
 extension LibraryView {
+    private var tags: [String] { RecordingRepository.tagUsage(in: recordings) }
+
+    private var results: [RecordingSearchResult] {
+        RecordingSearch.results(for: searchText, in: recordings, tag: selectedTag)
+    }
+
+    private var isFiltering: Bool {
+        selectedTag != nil || !RecordingSearch.terms(in: searchText).isEmpty
+    }
+
+    @ViewBuilder
+    private var resultsList: some View {
+        let shown = results
+        List {
+            if !tags.isEmpty {
+                TagFilterBar(tags: tags, selection: $selectedTag)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
+            ForEach(shown) { result in
+                NavigationLink(value: PlayerRoute(recording: result.recording, startTime: result.moment?.time)) {
+                    RecordingRow(recording: result.recording, moment: result.moment)
+                }
+                .swipeActions(edge: .leading) {
+                    Button("Edit", systemImage: "pencil") { editing = result.recording }
+                        .tint(Brand.coral)
+                }
+                .swipeActions(edge: .trailing) {
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        pendingDeletion = result.recording
+                    }
+                }
+            }
+        }
+        .overlay {
+            if shown.isEmpty, isFiltering {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
+    }
+
     private func delete(_ recording: Recording) {
         do {
             // A leftover file (`.fileLeftBehind`) is invisible to the user and swept at next launch.
             try repository.delete(recording)
         } catch {
             deletionMessage = error.localizedDescription
+        }
+    }
+}
+
+/// Where a tap on a note goes: the player, optionally at a moment found by a search.
+struct PlayerRoute: Hashable {
+    let recording: Recording
+    var startTime: TimeInterval?
+}
+
+/// A row of chips to show only the notes with one tag. Tapping the chosen tag clears the filter.
+private struct TagFilterBar: View {
+    let tags: [String]
+    @Binding var selection: String?
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: Brand.Spacing.small) {
+                ForEach(tags, id: \.self) { tag in
+                    let isSelected = selection.map(TagList.key) == TagList.key(tag)
+                    Button {
+                        selection = isSelected ? nil : tag
+                    } label: {
+                        Text("#\(tag)")
+                            .font(.subheadline.weight(.medium))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .foregroundStyle(isSelected ? Color.white : Color.primary)
+                            .background(isSelected ? AnyShapeStyle(Brand.gradient) : AnyShapeStyle(.quaternary), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 4)
         }
     }
 }

@@ -4,11 +4,14 @@ import SwiftUI
 struct PlayerView: View {
     let recording: Recording
     let fileURL: URL
+    /// Where to start, when the note was opened from a search result.
+    var startTime: TimeInterval?
     let repository: RecordingRepository
     let model: PlayerViewModel
 
     /// The position being dragged to. While set, it wins over the player's own position.
     @State private var scrubTime: TimeInterval?
+    @State private var isEditingDetails = false
 
     private var shownTime: TimeInterval { scrubTime ?? model.currentTime }
     private var shownProgress: Double {
@@ -76,7 +79,19 @@ struct PlayerView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .onAppear { model.load(url: fileURL) }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Edit details", systemImage: "pencil") { isEditingDetails = true }
+                    .accessibilityIdentifier("player.edit")
+            }
+        }
+        .sheet(isPresented: $isEditingDetails) {
+            RecordingDetailsSheet(recording: recording, repository: repository)
+        }
+        .onAppear {
+            model.load(url: fileURL)
+            if let startTime { model.seek(to: startTime) }
+        }
         .onDisappear { model.stop() }
     }
 

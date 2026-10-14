@@ -3,6 +3,11 @@
 Phase 1 of the roadmap. This document fixes the problem, the MVP scope, the screens and the user
 flows so that the audio architecture and persistence work can start without product ambiguity.
 
+> **Positioning for launch** (niche, one-line proposal and differentiation) is at the
+> [end of this document](#positioning-for-launch). The scope tables below describe the MVP as it was
+> defined; transcription, search, renaming, tags and sharing were built afterwards (see
+> [RELEASE_NOTES.md](RELEASE_NOTES.md)).
+
 ## Problem
 
 Capturing a thought by voice should take one tap and no setup. Existing recorders either bury the
@@ -136,3 +141,58 @@ These decisions unblock the architecture (#2) and persistence (#3) work.
   document).
 - Unit tests cover state transitions, waveform buffer bounds and deletion consistency.
 - Architecture, audio pipeline and trade-offs are documented.
+
+## Positioning for launch
+
+Decision for issue #31, taken on October 14, 2026. The *niche* is a choice; the claims about users and
+about Voice Memos below are **hypotheses to test**, not findings. See [Validation](#validation).
+
+### Niche
+
+- **Primary: spoken journals.** People who talk through their day or their thoughts and want to keep it
+  private. Privacy is the argument that matters most to them, and they search their own past often.
+- **Secondary: students and journalists.** Lectures, interviews and reporting notes that must be found
+  again by what was said. Here the open question is how well on-device transcription holds up on long,
+  noisy audio (not measured yet).
+- **Not now:** music ideas (transcription adds nothing) and hands-free car notes (needs quick capture,
+  issue #36, which does not exist yet).
+
+### Proposition, in one sentence
+
+> MURMUR is the voice notebook that turns what you say into searchable text without your audio ever
+> leaving your iPhone.
+
+### The three features that carry it
+
+| Feature | State | What the user gets |
+| --- | --- | --- |
+| **Private transcription** | Built (#33) | Text from every note, on the device, with on-device recognition required. No account, no server. |
+| **Search** | Built (#34) | Find a note by title, tag or anything said in it, and jump to the moment. |
+| **Quick capture** | Not built (#36) | Start recording from the lock screen or a button, before the thought is gone. |
+
+Everything else (export as `.txt`/`.md`, editing the transcript, six interface languages) supports these
+three and does not need its own message. Priorities for the open issues follow from this table: #36 comes
+next because it is the only pillar missing; #37 (AI summaries) and #38 (iCloud/iPad) come after the niche
+is validated, and #37 must not break the "nothing leaves your device" promise.
+
+### Against Voice Memos
+
+Voice Memos is free, preinstalled and also transcribes, so "it transcribes" is not a differentiator. What
+MURMUR bets on (to verify by hand in the same iOS version before using any of it in public copy):
+
+- **Tags plus search across titles and transcripts**, landing on the exact moment in the audio.
+- **Export of audio and text** as plain files (`.m4a`, `.txt`, `.md`) for notes apps and editors.
+- **A stated privacy promise**: recognition is forced on-device and there is no fallback to a server;
+  if a language is not available offline, the app says so.
+- **Six interface languages** (en, es, fr, de, it, pt).
+
+What MURMUR does not try to beat: sync across devices, a Mac app, or being preinstalled.
+
+### Validation
+
+Nothing here is validated until people outside the project say so.
+
+1. Talk to 5 to 10 people in each niche. Use [INTERVIEW_GUIDE.md](INTERVIEW_GUIDE.md).
+2. Publish the [landing page](index.html) (GitHub Pages from `/docs`) and measure interest. The
+   indicative target is 100 visits and 10 sign-ups; it is a hypothesis, not a promise.
+3. After the interviews, change this section: keep the niche that shows real pull, drop the other.

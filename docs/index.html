@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MURMUR: your voice notes, as text, private</title>
+<meta name="description" content="MURMUR turns your voice notes into searchable text on your iPhone. Your audio never leaves the device.">
+<style>
+  :root { --bg:#ffffff; --fg:#17122b; --muted:#5b5670; --violet:#3b1f8f; --coral:#c2412d; --card:#f4f1fb; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#120d24; --fg:#f3f0fa; --muted:#b4aecb; --violet:#a58bff; --coral:#ff8a73; --card:#1d1637; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.55 -apple-system, system-ui, "Segoe UI", sans-serif; }
+  main { max-width:880px; margin:0 auto; padding:48px 20px 64px; }
+  h1 { font-size:clamp(2rem,6vw,3rem); line-height:1.1; margin:0 0 16px; }
+  h2 { font-size:1.35rem; margin:48px 0 12px; }
+  .lead { font-size:1.2rem; color:var(--muted); max-width:36em; }
+  .hero { display:grid; gap:32px; align-items:center; grid-template-columns:1fr; }
+  @media (min-width:760px) { .hero { grid-template-columns:1.2fr 1fr; } }
+  .hero img { width:100%; max-width:300px; justify-self:center; border-radius:24px; border:1px solid var(--card); }
+  .cta { display:inline-block; margin:24px 0 8px; padding:14px 22px; border-radius:14px; background:var(--violet); color:var(--bg); font-weight:600; text-decoration:none; }
+  .cta[aria-disabled="true"] { opacity:.7; }
+  .note { color:var(--muted); font-size:.95rem; }
+  .grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+  .card { background:var(--card); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:1.05rem; }
+  .card p { margin:0; color:var(--muted); }
+  .soon { color:var(--coral); font-weight:600; font-size:.85rem; }
+  a { color:var(--violet); }
+  footer { margin-top:56px; font-size:.9rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div>
+      <h1>Say it. Find it later. Keep it private.</h1>
+      <p class="lead">MURMUR turns your voice notes into searchable text, on your iPhone. Your audio never leaves the device, and there is no account.</p>
+      <!-- TODO(#42): replace href with the public TestFlight link once the beta exists, then remove aria-disabled. -->
+      <a class="cta" href="#beta" aria-disabled="true">Join the beta (coming soon)</a>
+      <p class="note">For spoken journals, lectures and interviews.</p>
+    </div>
+    <img src="screenshots/03-player.png" alt="MURMUR's player showing a voice note with its waveform and playback controls">
+  </section>
+
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>Private transcription</h3><p>Text for every note, made on your iPhone with on-device recognition. If a language isn't available offline, MURMUR says so instead of sending audio to a server.</p></div>
+    <div class="card"><h3>Search what you said</h3><p>Find notes by title, tag or any word in the transcript, and jump to that moment in the audio.</p></div>
+    <div class="card"><h3>Quick capture</h3><p>Start recording before the thought is gone. <span class="soon">In progress</span></p></div>
+  </div>
+
+  <h2 id="beta">Beta</h2>
+  <p>The TestFlight beta is not open yet. Until it is, you can follow progress or tell me what you'd want from it on <a href="https://github.com/Cosmichomeless/MURMUR/issues">GitHub</a>.</p>
+
+  <h2>Also</h2>
+  <p>Export audio and text as <code>.m4a</code>, <code>.txt</code> or <code>.md</code>. Tags. Available in English, Spanish, French, German, Italian and Portuguese.</p>
+
+  <section lang="es">
+    <h2>En español</h2>
+    <p><strong>Dilo. Encuéntralo después. Mantenlo privado.</strong> MURMUR convierte tus notas de voz en texto buscable, en tu iPhone. Tu audio nunca sale del dispositivo y no hay cuenta. La beta de TestFlight aún no está abierta.</p>
+  </section>
+
+  <footer>
+    <a href="privacy.md">Privacy policy</a> · <a href="support.md">Support</a> · <a href="https://github.com/Cosmichomeless/MURMUR">Source</a>
+  </footer>
+</main>
+</body>
+</html>

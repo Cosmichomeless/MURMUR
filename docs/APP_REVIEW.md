@@ -16,11 +16,11 @@ MURMUR is a voice-note recorder. It needs no account or sign-in.
 
 Answer: **Data Not Collected.** Nothing is sent off the device, there are no analytics, ads or SDKs, so no data type applies and nothing is used for tracking. This matches `MURMUR/PrivacyInfo.xcprivacy` (`NSPrivacyTracking = false`, no collected data types, one required-reason API: UserDefaults `CA92.1`, used for the transcription language setting).
 
-Privacy policy URL: `https://github.com/Cosmichomeless/MURMUR/blob/main/docs/privacy.md` (published once these docs are on `main`).
+Privacy policy URL: `https://cosmichomeless.github.io/MURMUR/privacy.html` (GitHub Pages, served from `docs/`; regenerate the HTML with `scripts/build-pages.py` after editing the `.md`).
 
 ## Support URL
 
-`https://github.com/Cosmichomeless/MURMUR/blob/main/docs/support.md` (the same condition applies).
+`https://cosmichomeless.github.io/MURMUR/support.html` (same site).
 
 ## Age rating
 

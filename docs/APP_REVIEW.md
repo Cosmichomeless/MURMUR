@@ -20,11 +20,11 @@ Answer: **Data Not Collected.** Nothing is sent to the developer or any third pa
 
 **To confirm before entering it:** the optional iCloud sync stores user content in the user's own private CloudKit database, which the developer cannot read. Apple's guidance is that data the developer cannot access is not "collected", so *Data Not Collected* is expected to remain correct, but this has not been checked in App Store Connect and needs the developer's decision. The app also needs the iCloud/CloudKit capability and a registered container on the developer account (not done).
 
-Privacy policy URL: `https://github.com/Cosmichomeless/MURMUR/blob/main/docs/privacy.md` (published once these docs are on `main`).
+Privacy policy URL: `https://cosmichomeless.github.io/MURMUR/privacy.html` (GitHub Pages, served from `docs/`; regenerate the HTML with `scripts/build-pages.py` after editing the `.md`).
 
 ## Support URL
 
-`https://github.com/Cosmichomeless/MURMUR/blob/main/docs/support.md` (the same condition applies).
+`https://cosmichomeless.github.io/MURMUR/support.html` (same site).
 
 ## Age rating
 

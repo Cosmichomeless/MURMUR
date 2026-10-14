@@ -1,16 +1,38 @@
 # Release notes
 
-## 1.0 — First App Store release
+## 1.0.0 — Search, share, transcribe, localized
 
-The first version prepared for the App Store, for iPhone and iPad. On top of the 0.1.0 MVP below:
+Everything in 0.1.0, plus the features needed to make a voice note worth keeping. This is the
+version prepared for TestFlight and App Store review.
 
-- **Transcription on device** with Apple's Speech framework. Audio never leaves the device.
-- **Library:** rename notes, add tags, and search titles, tags and transcripts.
-- **Share and export** audio and transcripts as `.m4a`, `.txt` or `.md`.
-- **Quick capture** from App Intents, widgets, Control Center and a Live Activity.
-- **iPad:** adaptive split-view layout.
-- **Optional iCloud sync** of notes and audio, off by default.
-- **Six languages:** English, Spanish, French, German, Italian and Portuguese.
+### What is new
+
+- **Transcription on the device.** Notes are transcribed with the Speech framework, requiring
+  on-device recognition so audio and text never leave the phone. iOS 26 uses `SpeechAnalyzer`;
+  earlier versions use `SFSpeechRecognizer`.
+- **Rename, tag and search.** Rename notes, add tags, and search titles, tags and transcripts, jumping
+  to the matching moment of the recording. Adds schema V3 to the SwiftData store.
+- **Share and export.** Share the audio (`.m4a`) or the transcript (`.txt` / `.md`) from the player,
+  and several notes at once from the library in selection mode.
+- **Spanish, French, German, Italian and Portuguese.** All interface strings and permission prompts
+  are in a String Catalog.
+- **Quick capture.** Start a recording from App Intents, widgets, Control Center and a Live Activity.
+- **iPad.** Adaptive split-view layout, and iPad is a supported device.
+- **Optional iCloud sync.** Notes and audio can be mirrored to the user's private CloudKit database.
+  Off by default.
+- **App Review material.** Privacy manifest, privacy policy and support page, review notes in
+  [APP_REVIEW.md](APP_REVIEW.md) and the store text in [app-store-listing.md](app-store-listing.md).
+
+### Known limits
+
+- Everything above was tried by hand on a physical iPhone by the developer before release and worked
+  as expected. No measurements were recorded: transcription accuracy and speed in Spanish and
+  English are not quantified, and the figures in [PERFORMANCE.md](PERFORMANCE.md) still come from
+  the simulator.
+- The translations have not been reviewed by native speakers.
+- The default title of a note is stored in the language active when it was created.
+- Nothing has been entered in App Store Connect: privacy labels, age rating and EU trader status are
+  still to be completed.
 
 ## 0.1.0 — First complete build
 
@@ -58,15 +80,10 @@ It is a source release: you build it with Xcode and run it on a simulator or you
 
 ### Known limits
 
-- iPhone and iPad, iOS 17 or later. The iPad split-view layout has only been seen in the simulator in
-  portrait; landscape, Split View and Stage Manager were not checked.
-- iCloud sync is optional (off by default) and **has not been tested against a real CloudKit
-  container or iCloud account**: it needs the iCloud capability and a registered container, and the
-  entitlements affect code signing of every device build. Turning it on or off applies at the next
-  launch.
+- iPhone only, iOS 17 or later. Portrait is the designed layout.
 - Interruption, route-change and permission handling is tested with fakes. It has **not** been
   checked on a physical device with a real call or real headphones.
 - The performance figures come from the simulator on a Mac, not from an iPhone.
 - No rename, search, share, export, folders, sync, accounts or transcription. These are out of scope
   by design.
-- No Release-signed build, TestFlight build, App Store listing or CI pipeline exists yet.
+- No Release-signed build, TestFlight build or App Store listing exists yet.

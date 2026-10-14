@@ -119,7 +119,7 @@ Cómo se midió y qué significa cada cifra: [docs/PERFORMANCE.md](docs/PERFORMA
 - **No hay distribución**: ni TestFlight ni App Store, y tampoco CI. Se compila desde el código.
 - **Sin probar en un iPhone físico**: interrupciones, cambios de ruta y permisos se prueban con dobles (`FakeAudioSession`), no con una llamada real ni con auriculares reales.
 - Las cifras de rendimiento son de simulador, no de dispositivo.
-- iPhone y iPad, iOS 17 o posterior. El diseño de iPad (vista dividida) solo se ha visto en el simulador en vertical. La sincronización con iCloud es opcional y no se ha probado contra un contenedor real de CloudKit.
+- Solo iPhone, iOS 17 o posterior, pensada para vertical.
 - Sin renombrar, buscar, compartir, exportar, carpetas, sincronización, cuentas ni transcripción: fuera de alcance a propósito.
 - No hay micrófonos Bluetooth HFP: se usa el integrado.
 - El modo demo y su voz sintética solo existen en builds Debug; la app real nunca los incluye.
@@ -134,7 +134,7 @@ Cómo se midió y qué significa cada cifra: [docs/PERFORMANCE.md](docs/PERFORMA
 | [docs/PERSISTENCE.md](docs/PERSISTENCE.md) | Modelo, archivos y consistencia |
 | [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Tests y mediciones |
 | [docs/DEMO.md](docs/DEMO.md) | Modo demo y cómo repetir las capturas |
-| [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) | Notas de las versiones 1.0 y 0.1.0 |
+| [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) | Notas de la versión 1.0.0 |
 | [docs/PROJECT.md](docs/PROJECT.md) | Objetivos, stack y hoja de ruta original |
 
 La documentación de `docs/` está escrita en inglés.

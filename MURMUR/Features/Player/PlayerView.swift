@@ -74,6 +74,8 @@ struct PlayerView: View {
             .scrollBounceBehavior(.basedOnSize)
         }
         .padding()
+        // Keeps the controls a readable width on a wide screen instead of stretching them.
+        .frame(maxWidth: 640)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .brandScreen()
         .navigationTitle(recording.title)

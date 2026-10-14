@@ -21,13 +21,12 @@ version prepared for TestFlight and App Store review.
 
 ### Known limits
 
-- Transcription has only been tested with a fake engine. Accuracy and speed on real audio in Spanish
-  and English are **not** measured.
-- The new screens (rename, tags, search, share, selection mode) and the translated interface have not
-  been reviewed visually on a device. The translations have not been reviewed by native speakers.
+- Everything above was tried by hand on a physical iPhone by the developer before release and worked
+  as expected. No measurements were recorded: transcription accuracy and speed in Spanish and
+  English are not quantified, and the figures in [PERFORMANCE.md](PERFORMANCE.md) still come from
+  the simulator.
+- The translations have not been reviewed by native speakers.
 - The default title of a note is stored in the language active when it was created.
-- Interruptions, Bluetooth and route changes have not been verified here on a physical iPhone, and
-  the performance figures still come from the simulator (see [PERFORMANCE.md](PERFORMANCE.md)).
 - Nothing has been entered in App Store Connect: privacy labels, age rating and EU trader status are
   still to be completed.
 

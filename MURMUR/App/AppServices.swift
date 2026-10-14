@@ -32,6 +32,9 @@ struct AppServices {
         }
         #endif
         let fileStore = RecordingFileStore.default
+        // The unit tests run inside the app: ActivityKit has nothing to show there (and can stall on a
+        // headless CI machine), and the recorder tests use their own fake.
+        let underTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
         return AppServices(
             fileStore: fileStore,
             inMemory: false,
@@ -41,7 +44,7 @@ struct AppServices {
                 removeFile: { fileStore.removeTemporary(at: $0) }
             ),
             speech: AppleSpeechEngine(),
-            activity: RecordingActivityController(),
+            activity: underTest ? nil : RecordingActivityController(),
             seedLibrary: nil
         )
     }

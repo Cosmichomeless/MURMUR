@@ -17,6 +17,11 @@ struct LibraryView: View {
     @State private var editing: Recording?
     @State private var pendingDeletion: Recording?
     @State private var deletionMessage: String?
+    @State private var editMode: EditMode = .inactive
+    @State private var selection = Set<Recording.ID>()
+    @State private var sharing = ShareCoordinator()
+
+    private var isSelecting: Bool { editMode.isEditing }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -34,7 +39,18 @@ struct LibraryView: View {
                     Button("Settings", systemImage: "gearshape") { isShowingSettings = true }
                         .accessibilityIdentifier("library.settings")
                 }
+                if !recordings.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button(isSelecting ? "Done" : "Select") {
+                            withAnimation { editMode = isSelecting ? .inactive : .active }
+                        }
+                        .accessibilityIdentifier("library.select")
+                    }
+                }
             }
+            .environment(\.editMode, $editMode)
+            .onChange(of: editMode) { if !isSelecting { selection.removeAll() } }
+            .shareSheet(sharing)
             .sheet(isPresented: $isShowingSettings) { SettingsView() }
             .sheet(item: $editing) { recording in
                 RecordingDetailsSheet(recording: recording, repository: repository)
@@ -49,16 +65,20 @@ struct LibraryView: View {
                 )
             }
             .safeAreaInset(edge: .bottom) {
-                Button {
-                    // Capture and playback must not overlap: they need different session categories.
-                    player.stop()
-                    isRecording = true
-                } label: {
-                    Image(systemName: "mic.fill")
+                if isSelecting {
+                    selectionBar
+                } else {
+                    Button {
+                        // Capture and playback must not overlap: they need different session categories.
+                        player.stop()
+                        isRecording = true
+                    } label: {
+                        Image(systemName: "mic.fill")
+                    }
+                    .buttonStyle(BrandRoundButtonStyle(kind: .accent, size: 64))
+                    .accessibilityLabel("Record")
+                    .padding(.bottom, Brand.Spacing.small)
                 }
-                .buttonStyle(BrandRoundButtonStyle(kind: .accent, size: 64))
-                .accessibilityLabel("Record")
-                .padding(.bottom, Brand.Spacing.small)
             }
             .confirmationDialog(
                 "Delete this recording?",
@@ -128,7 +148,7 @@ extension LibraryView {
     @ViewBuilder
     private var resultsList: some View {
         let shown = results
-        List {
+        List(selection: $selection) {
             if !tags.isEmpty {
                 TagFilterBar(tags: tags, selection: $selectedTag)
                     .listRowInsets(EdgeInsets())
@@ -155,6 +175,31 @@ extension LibraryView {
                 ContentUnavailableView.search(text: searchText)
             }
         }
+    }
+
+    /// Replaces the record button while notes are being picked: share the picked notes, or all shown.
+    private var selectionBar: some View {
+        let picked = recordings.filter { selection.contains($0.id) }
+        return HStack {
+            Text(picked.isEmpty ? "Select notes to share" : "\(picked.count) selected")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Menu {
+                ForEach(ShareChoice.allCases) { choice in
+                    Button(choice.title, systemImage: choice.symbol) {
+                        sharing.share(picked, choice: choice, fileStore: repository.fileStore)
+                    }
+                }
+            } label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+            .disabled(picked.isEmpty || sharing.isPreparing)
+            .accessibilityIdentifier("library.shareSelected")
+        }
+        .padding(.horizontal)
+        .padding(.vertical, Brand.Spacing.small)
+        .background(.bar)
     }
 
     private func delete(_ recording: Recording) {

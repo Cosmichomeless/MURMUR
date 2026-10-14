@@ -1,5 +1,17 @@
 # Release notes
 
+## 1.0 — First App Store release
+
+The first version prepared for the App Store, for iPhone and iPad. On top of the 0.1.0 MVP below:
+
+- **Transcription on device** with Apple's Speech framework. Audio never leaves the device.
+- **Library:** rename notes, add tags, and search titles, tags and transcripts.
+- **Share and export** audio and transcripts as `.m4a`, `.txt` or `.md`.
+- **Quick capture** from App Intents, widgets, Control Center and a Live Activity.
+- **iPad:** adaptive split-view layout.
+- **Optional iCloud sync** of notes and audio, off by default.
+- **Six languages:** English, Spanish, French, German, Italian and Portuguese.
+
 ## 0.1.0 — First complete build
 
 The first version with the whole MVP in place: record, see the signal, keep the note, play it back.

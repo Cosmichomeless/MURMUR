@@ -1,5 +1,36 @@
 # Release notes
 
+## 1.0.0 — Search, share, transcribe, localized
+
+Everything in 0.1.0, plus the features needed to make a voice note worth keeping. This is the
+version prepared for TestFlight and App Store review.
+
+### What is new
+
+- **Transcription on the device.** Notes are transcribed with the Speech framework, requiring
+  on-device recognition so audio and text never leave the phone. iOS 26 uses `SpeechAnalyzer`;
+  earlier versions use `SFSpeechRecognizer`.
+- **Rename, tag and search.** Rename notes, add tags, and search titles, tags and transcripts, jumping
+  to the matching moment of the recording. Adds schema V3 to the SwiftData store.
+- **Share and export.** Share the audio (`.m4a`) or the transcript (`.txt` / `.md`) from the player,
+  and several notes at once from the library in selection mode.
+- **Spanish, French, German, Italian and Portuguese.** All interface strings and permission prompts
+  are in a String Catalog.
+- **App Review material.** Privacy manifest, privacy policy and support page, review notes in
+  [APP_REVIEW.md](APP_REVIEW.md) and the store text in [app-store-listing.md](app-store-listing.md).
+
+### Known limits
+
+- Transcription has only been tested with a fake engine. Accuracy and speed on real audio in Spanish
+  and English are **not** measured.
+- The new screens (rename, tags, search, share, selection mode) and the translated interface have not
+  been reviewed visually on a device. The translations have not been reviewed by native speakers.
+- The default title of a note is stored in the language active when it was created.
+- Interruptions, Bluetooth and route changes have not been verified here on a physical iPhone, and
+  the performance figures still come from the simulator (see [PERFORMANCE.md](PERFORMANCE.md)).
+- Nothing has been entered in App Store Connect: privacy labels, age rating and EU trader status are
+  still to be completed.
+
 ## 0.1.0 — First complete build
 
 The first version with the whole MVP in place: record, see the signal, keep the note, play it back.
@@ -52,4 +83,4 @@ It is a source release: you build it with Xcode and run it on a simulator or you
 - The performance figures come from the simulator on a Mac, not from an iPhone.
 - No rename, search, share, export, folders, sync, accounts or transcription. These are out of scope
   by design.
-- No Release-signed build, TestFlight build, App Store listing or CI pipeline exists yet.
+- No Release-signed build, TestFlight build or App Store listing exists yet.

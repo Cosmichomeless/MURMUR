@@ -134,7 +134,7 @@ Cómo se midió y qué significa cada cifra: [docs/PERFORMANCE.md](docs/PERFORMA
 | [docs/PERSISTENCE.md](docs/PERSISTENCE.md) | Modelo, archivos y consistencia |
 | [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Tests y mediciones |
 | [docs/DEMO.md](docs/DEMO.md) | Modo demo y cómo repetir las capturas |
-| [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) | Notas de la versión 0.1.0 |
+| [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) | Notas de la versión 1.0.0 |
 | [docs/PROJECT.md](docs/PROJECT.md) | Objetivos, stack y hoja de ruta original |
 
 La documentación de `docs/` está escrita en inglés.

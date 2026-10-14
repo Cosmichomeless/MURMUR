@@ -4,6 +4,7 @@ import SwiftUI
 struct PlayerView: View {
     let recording: Recording
     let fileURL: URL
+    let repository: RecordingRepository
     let model: PlayerViewModel
 
     /// The position being dragged to. While set, it wins over the player's own position.
@@ -63,7 +64,10 @@ struct PlayerView: View {
                     .multilineTextAlignment(.center)
             }
 
-            Spacer()
+            ScrollView {
+                TranscriptSection(recording: recording, repository: repository, model: model)
+            }
+            .scrollBounceBehavior(.basedOnSize)
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)

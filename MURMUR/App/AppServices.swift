@@ -9,6 +9,7 @@ struct AppServices {
     let inMemory: Bool
     let session: any AudioSessionControlling
     let recorder: any AudioRecording
+    let speech: any SpeechEngine
     /// Fills the library before the first screen. `nil` in a normal launch.
     let seedLibrary: ((RecordingRepository) throws -> Void)?
 
@@ -22,6 +23,7 @@ struct AppServices {
                 inMemory: true,
                 session: DemoSession(playback: AudioSessionManager()),
                 recorder: DemoRecorder(store: store),
+                speech: DemoSpeechEngine(),
                 seedLibrary: seed
             )
         }
@@ -35,6 +37,7 @@ struct AppServices {
                 makeTemporaryURL: { fileStore.makeTemporaryURL() },
                 removeFile: { fileStore.removeTemporary(at: $0) }
             ),
+            speech: AppleSpeechEngine(),
             seedLibrary: nil
         )
     }

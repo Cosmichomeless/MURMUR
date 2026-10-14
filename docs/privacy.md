@@ -8,6 +8,8 @@
 
 Your voice recordings, their titles, tags and transcripts are stored only on your device, inside the app's private storage. MURMUR uses the microphone only while you record (and keeps recording if you leave the app while a recording is in progress). Recordings are never uploaded, shared or analysed outside your device.
 
+**iCloud sync is optional and off by default.** If you turn on *Sync with iCloud* in Settings, your notes (titles, tags, transcripts and audio) are stored in your own private iCloud, the same account that holds your other Apple data, so they appear on your other devices. That data goes from your device to Apple's iCloud under your Apple account, never to a server of ours, and we cannot see it. Turn the setting off and MURMUR stops using iCloud; what is already in iCloud stays until you delete it there.
+
 **Transcription runs on your device.** MURMUR uses Apple's Speech framework with on-device recognition required, so your audio is never sent to Apple or to anyone else. If a language is not available for on-device recognition, MURMUR tells you and does not transcribe; it never falls back to a server.
 
 **Sharing is your choice.** MURMUR only sends a note somewhere when you tap Share or Export and pick a destination in the iOS share sheet. What happens to it afterwards depends on the app you chose.
@@ -20,11 +22,11 @@ Your voice recordings, their titles, tags and transcripts are stored only on you
 
 ## Data collection and sharing
 
-We (the developer) do not collect, receive or share any personal data. Nothing leaves your device through the app, so there is nothing for us to sell, share or use for tracking. If you back up your device with iCloud or your computer, Apple's backup may include the app's data under your own Apple account settings.
+We (the developer) do not collect, receive or share any personal data. Nothing reaches us: the only thing that can leave your device is your own iCloud sync, if you turn it on, and it goes to your own iCloud account. There is nothing for us to sell, share or use for tracking. If you back up your device with iCloud or your computer, Apple's backup may include the app's data under your own Apple account settings.
 
 ## Deleting your data
 
-Deleting a recording inside the app removes its audio file and data. Uninstalling the app removes everything.
+Deleting a recording inside the app removes its audio file and data, and with iCloud sync on it is removed from your other devices too. Uninstalling the app removes everything on the device; copies in your iCloud are removed from iCloud's storage settings.
 
 ## Children
 
@@ -48,7 +50,9 @@ Questions about privacy: open an issue at <https://github.com/Cosmichomeless/MUR
 
 ## Qué hace la app con tus datos
 
-Tus grabaciones de voz, sus títulos, etiquetas y transcripciones se guardan solo en tu dispositivo, en el almacenamiento privado de la app. MURMUR usa el micrófono únicamente mientras grabas (y sigue grabando si sales de la app con una grabación en curso). Las grabaciones no se suben, comparten ni analizan fuera de tu dispositivo.
+Tus grabaciones de voz, sus títulos, etiquetas y transcripciones se guardan en tu dispositivo, en el almacenamiento privado de la app. MURMUR usa el micrófono únicamente mientras grabas (y sigue grabando si sales de la app con una grabación en curso). Las grabaciones no se suben, comparten ni analizan fuera de tu dispositivo.
+
+**La sincronización con iCloud es opcional y está desactivada por defecto.** Si activas *Sincronizar con iCloud* en Ajustes, tus notas (títulos, etiquetas, transcripciones y audio) se guardan en tu iCloud privado, la misma cuenta que guarda el resto de tus datos de Apple, y aparecen en tus otros dispositivos. Esos datos van de tu dispositivo al iCloud de Apple bajo tu cuenta, nunca a un servidor nuestro, y no podemos verlos. Si la desactivas, MURMUR deja de usar iCloud; lo que ya esté en iCloud permanece hasta que lo borres allí.
 
 **La transcripción se hace en tu dispositivo.** MURMUR usa el framework Speech de Apple exigiendo reconocimiento en el dispositivo, así que tu audio no se envía ni a Apple ni a nadie. Si un idioma no está disponible para reconocimiento en el dispositivo, MURMUR te lo dice y no transcribe; nunca recurre a un servidor.
 
@@ -62,11 +66,11 @@ Tus grabaciones de voz, sus títulos, etiquetas y transcripciones se guardan sol
 
 ## Recogida y cesión de datos
 
-Nosotros (el desarrollador) no recogemos, recibimos ni compartimos ningún dato personal. Nada sale de tu dispositivo a través de la app, así que no hay nada que vender, compartir ni usar para rastrearte. Si haces copia de seguridad con iCloud o con tu ordenador, la copia de Apple puede incluir los datos de la app según los ajustes de tu cuenta de Apple.
+Nosotros (el desarrollador) no recogemos, recibimos ni compartimos ningún dato personal. Nada nos llega a nosotros: lo único que puede salir de tu dispositivo es tu propia sincronización con iCloud, si la activas, y va a tu propia cuenta de iCloud. No hay nada que vender, compartir ni usar para rastrearte. Si haces copia de seguridad con iCloud o con tu ordenador, la copia de Apple puede incluir los datos de la app según los ajustes de tu cuenta de Apple.
 
 ## Borrado de datos
 
-Borrar una grabación dentro de la app elimina su archivo de audio y sus datos. Desinstalar la app lo elimina todo.
+Borrar una grabación dentro de la app elimina su archivo de audio y sus datos, y con la sincronización de iCloud activada también se elimina de tus otros dispositivos. Desinstalar la app elimina todo lo que hay en el dispositivo; las copias en tu iCloud se eliminan desde los ajustes de almacenamiento de iCloud.
 
 ## Menores
 

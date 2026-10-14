@@ -15,7 +15,7 @@ struct SchemaMigrationTests {
 
         do {
             let schema = Schema(versionedSchema: MurmurSchemaV1.self)
-            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url)])
+            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)])
             container.mainContext.insert(MurmurSchemaV1.Recording(
                 id: id, title: "Old note", fileName: "old.m4a", duration: 42, createdAt: date,
                 waveformData: WaveformCodec.encode(waveform)
@@ -44,7 +44,7 @@ struct SchemaMigrationTests {
         let url = store.root.appendingPathComponent("v1.sqlite")
         do {
             let schema = Schema(versionedSchema: MurmurSchemaV1.self)
-            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url)])
+            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)])
             container.mainContext.insert(MurmurSchemaV1.Recording(title: "Old", fileName: "o.m4a", duration: 1))
             try container.mainContext.save()
         }
@@ -63,7 +63,7 @@ struct SchemaMigrationTests {
         let id = UUID()
         do {
             let schema = Schema(versionedSchema: MurmurSchemaV2.self)
-            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url)])
+            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)])
             let old = MurmurSchemaV2.Recording(id: id, title: "Transcribed", fileName: "t.m4a", duration: 9)
             old.transcriptText = "hello there"
             old.transcriptionStatusRaw = TranscriptionStatus.completed.rawValue
@@ -78,5 +78,29 @@ struct SchemaMigrationTests {
         #expect(recording.transcriptText == "hello there")
         #expect(recording.transcriptionStatus == .completed)
         #expect(recording.tags.isEmpty)
+    }
+
+    @Test func aVersionThreeStoreLosesItsUniqueConstraintAndKeepsEverything() throws {
+        let store = TestStore(); defer { store.cleanUp() }
+        let url = store.root.appendingPathComponent("v3.sqlite")
+        let id = UUID()
+        do {
+            let schema = Schema(versionedSchema: MurmurSchemaV3.self)
+            let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)])
+            let old = MurmurSchemaV3.Recording(id: id, title: "Tagged", fileName: "g.m4a", duration: 12, waveform: [0.2, 0.4])
+            old.transcriptText = "some words"
+            old.tagsRaw = "work\nideas"
+            container.mainContext.insert(old)
+            try container.mainContext.save()
+        }
+
+        let migrated = try PersistenceController.makeContainer(storeURL: url)
+        let recording = try #require(try migrated.mainContext.fetch(FetchDescriptor<Recording>()).first)
+        #expect(recording.id == id)
+        #expect(recording.title == "Tagged")
+        #expect(recording.fileName == "g.m4a")
+        #expect(recording.transcriptText == "some words")
+        #expect(recording.tags == ["work", "ideas"])
+        #expect(recording.waveform == [0.2, 0.4])
     }
 }

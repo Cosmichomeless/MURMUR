@@ -119,7 +119,7 @@ Cómo se midió y qué significa cada cifra: [docs/PERFORMANCE.md](docs/PERFORMA
 - **No hay distribución**: ni TestFlight ni App Store, y tampoco CI. Se compila desde el código.
 - **Sin probar en un iPhone físico**: interrupciones, cambios de ruta y permisos se prueban con dobles (`FakeAudioSession`), no con una llamada real ni con auriculares reales.
 - Las cifras de rendimiento son de simulador, no de dispositivo.
-- Solo iPhone, iOS 17 o posterior, pensada para vertical.
+- iPhone y iPad, iOS 17 o posterior. El diseño de iPad (vista dividida) solo se ha visto en el simulador en vertical. La sincronización con iCloud es opcional y no se ha probado contra un contenedor real de CloudKit.
 - Sin renombrar, buscar, compartir, exportar, carpetas, sincronización, cuentas ni transcripción: fuera de alcance a propósito.
 - No hay micrófonos Bluetooth HFP: se usa el integrado.
 - El modo demo y su voz sintética solo existen en builds Debug; la app real nunca los incluye.

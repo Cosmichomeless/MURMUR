@@ -9,12 +9,16 @@ MURMUR is a voice-note recorder. It needs no account or sign-in.
 - **Microphone:** used to record voice notes when the user taps Record.
 - **Background audio (`UIBackgroundModes: audio`):** a recording that is in progress must not stop when the user locks the phone or switches app: a voice memo that silently stops after a few seconds in the background would lose what the user was saying. The mode is used only while a recording or playback is active; the app plays and records nothing otherwise.
 - **Speech recognition:** optional. Notes are transcribed with Apple's Speech framework with `requiresOnDeviceRecognition = true`, so audio never leaves the device. If the language has no on-device model, the app says so and does not transcribe.
-- **No network use:** the app makes no network requests and includes no third-party SDKs. The privacy policy and support links open in Safari.
+- **iCloud (optional, off by default):** Settings › *Sync with iCloud* mirrors notes to the user's own private CloudKit database (container `iCloud.com.cosmichomeless.murmur`) so they appear on their other devices. It needs an iCloud account; the app works fully without one. The developer has no access to this data. Reviewers can ignore it: nothing is synced unless the switch is turned on, and the change applies at the next launch.
+- **No network use of our own:** the app makes no requests to servers of ours and includes no third-party SDKs. The only network traffic is iCloud sync, handled by Apple's CloudKit, and only if the user turns it on. The privacy policy and support links open in Safari.
+- **Devices:** iPhone and iPad (adaptive split view on iPad).
 - To test quickly: tap the microphone, say a sentence, tap Stop. The note appears in the library; open it to play it and read the transcript (allow Speech Recognition when asked).
 
 ## App Privacy ("nutrition label")
 
-Answer: **Data Not Collected.** Nothing is sent off the device, there are no analytics, ads or SDKs, so no data type applies and nothing is used for tracking. This matches `MURMUR/PrivacyInfo.xcprivacy` (`NSPrivacyTracking = false`, no collected data types, one required-reason API: UserDefaults `CA92.1`, used for the transcription language setting).
+Answer: **Data Not Collected.** Nothing is sent to the developer or any third party, there are no analytics, ads or SDKs, so no data type applies and nothing is used for tracking. This matches `MURMUR/PrivacyInfo.xcprivacy` (`NSPrivacyTracking = false`, no collected data types, one required-reason API: UserDefaults `CA92.1`, used for the transcription language setting and the iCloud switch).
+
+**To confirm before entering it:** the optional iCloud sync stores user content in the user's own private CloudKit database, which the developer cannot read. Apple's guidance is that data the developer cannot access is not "collected", so *Data Not Collected* is expected to remain correct, but this has not been checked in App Store Connect and needs the developer's decision. The app also needs the iCloud/CloudKit capability and a registered container on the developer account (not done).
 
 Privacy policy URL: `https://github.com/Cosmichomeless/MURMUR/blob/main/docs/privacy.md` (published once these docs are on `main`).
 

@@ -46,7 +46,12 @@ It is a source release: you build it with Xcode and run it on a simulator or you
 
 ### Known limits
 
-- iPhone only, iOS 17 or later. Portrait is the designed layout.
+- iPhone and iPad, iOS 17 or later. The iPad split-view layout has only been seen in the simulator in
+  portrait; landscape, Split View and Stage Manager were not checked.
+- iCloud sync is optional (off by default) and **has not been tested against a real CloudKit
+  container or iCloud account**: it needs the iCloud capability and a registered container, and the
+  entitlements affect code signing of every device build. Turning it on or off applies at the next
+  launch.
 - Interruption, route-change and permission handling is tested with fakes. It has **not** been
   checked on a physical device with a real call or real headphones.
 - The performance figures come from the simulator on a Mac, not from an iPhone.

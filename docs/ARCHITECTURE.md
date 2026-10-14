@@ -49,7 +49,8 @@ Rules:
 MURMUR/
 ├── App/              app entry point, dependency container, root navigation
 ├── Audio/            session, recorder, player, waveform math (no UI, no SwiftData)
-├── Persistence/      SwiftData model, file store, repository, launch reconciler
+├── Persistence/      SwiftData model (schema V4), file store, repository, launch reconciler
+├── Sync/             optional iCloud: settings, audio sync rules, CloudKit audio channel
 ├── Design/           brand tokens (colors, spacing, shadow) and button styles
 ├── Features/
 │   ├── Library/      recordings list, empty state, record button
@@ -155,6 +156,10 @@ controls update on their own cadence.
 SwiftData stores metadata; the audio file lives in the file system. They are kept consistent by the
 repository using a defined order of operations and a launch-time reconciliation. Details and the
 file locations are in [PERSISTENCE.md](PERSISTENCE.md).
+
+With iCloud on (optional, off by default) metadata is mirrored by SwiftData and audio travels
+through `Sync/CloudKitAudioSync`; the repository only talks to the `AudioSyncing` protocol, so the
+rest of the app does not import CloudKit. Conflict rules are in PERSISTENCE.md.
 
 ## Error handling
 

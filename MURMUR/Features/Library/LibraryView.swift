@@ -22,6 +22,7 @@ struct LibraryView: View {
     @State private var sharing = ShareCoordinator()
     @State private var columnVisibility = NavigationSplitViewVisibility.doubleColumn
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(SyncSettings.self) private var sync
 
     private var isSelecting: Bool { editMode.isEditing }
     /// iPad (and any regular width): the list beside the player. iPhone and narrow windows: a stack.
@@ -243,7 +244,13 @@ extension LibraryView {
     /// A tap opens the note: pushed onto the stack, or selected so the detail column shows it.
     @ViewBuilder
     private func row(for result: RecordingSearchResult) -> some View {
-        let content = RecordingRow(recording: result.recording, moment: result.moment)
+        // Reading the revision makes the row refresh when audio arrives from iCloud.
+        let _ = sync.audioRevision
+        let content = RecordingRow(
+            recording: result.recording,
+            moment: result.moment,
+            audioAvailable: repository.fileStore.exists(fileName: result.recording.fileName)
+        )
         if usesSplitView {
             content.tag(result.id)
         } else {

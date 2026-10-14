@@ -3,11 +3,13 @@ import SwiftUI
 /// Transcription preferences and the links an App Store app is expected to have.
 struct SettingsView: View {
     @Environment(TranscriptionService.self) private var transcription
+    @Environment(SyncSettings.self) private var sync
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
     var body: some View {
         @Bindable var settings = transcription.settings
+        @Bindable var syncSettings = sync
         NavigationStack {
             Form {
                 Section {
@@ -33,6 +35,20 @@ struct SettingsView: View {
                     Text("Automatic follows your device's languages. Transcription runs on this device and your audio is never sent anywhere.")
                 }
 
+                Section {
+                    Toggle("Sync with iCloud", isOn: $syncSettings.isEnabled)
+                        .accessibilityIdentifier("settings.icloud")
+
+                    if let message = syncMessage {
+                        Label(message.text, systemImage: message.symbol)
+                            .font(.footnote)
+                    }
+                } header: {
+                    Text("iCloud")
+                } footer: {
+                    Text("Keeps your notes, transcripts and audio on all your devices through your own private iCloud. Nothing goes to MURMUR's servers, and it is off unless you turn it on.")
+                }
+
                 Section("About") {
                     Link("Privacy Policy", destination: AppLinks.privacyPolicy)
                         .accessibilityIdentifier("settings.privacy")
@@ -49,6 +65,27 @@ struct SettingsView: View {
                 }
             }
             .task { await transcription.loadAvailableLocales() }
+        }
+    }
+
+    /// What to tell the user about sync, most pressing first.
+    private var syncMessage: (text: LocalizedStringKey, symbol: String)? {
+        if sync.needsRestart {
+            return ("Restart MURMUR to apply this change.", "arrow.clockwise")
+        }
+        guard sync.isEnabled else { return nil }
+        switch sync.lastIssue {
+        case .noAccount:
+            return ("Sign in to iCloud in the Settings app to sync.", "person.crop.circle.badge.exclamationmark")
+        case .unavailable:
+            return ("iCloud isn't available right now. Your notes stay on this device.", "exclamationmark.icloud")
+        case .quotaExceeded:
+            return ("Your iCloud storage is full, so new audio can't be uploaded.", "exclamationmark.icloud")
+        case nil:
+            if FileManager.default.ubiquityIdentityToken == nil {
+                return ("Sign in to iCloud in the Settings app to sync.", "person.crop.circle.badge.exclamationmark")
+            }
+            return ("Syncing with iCloud.", "checkmark.icloud")
         }
     }
 

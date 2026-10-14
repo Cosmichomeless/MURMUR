@@ -206,8 +206,11 @@ struct QuickCaptureRecorderTests {
         await settle()
 
         let latency = try? #require(h.model.startLatency)
+        let sinceTheRequest = asked.duration(to: .now)
         #expect((latency ?? .zero) >= .milliseconds(300))
-        #expect((latency ?? .seconds(99)) < .seconds(5))
+        // It cannot exceed the time since the request, however slow the machine is. A fixed bound in
+        // seconds would measure the CI runner, not the app.
+        #expect((latency ?? .seconds(99)) <= sinceTheRequest)
     }
 
     @Test func measuresOnlyTheFirstAudio() async {

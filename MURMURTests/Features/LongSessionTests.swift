@@ -53,7 +53,7 @@ struct LongSessionTests {
         #expect(model.waveform.count == LiveWaveform.defaultCapacity)
         #expect(model.elapsed == Double(samples) * RecordingTapProcessor.sampleWindow)
         #expect(growth < 20, "50 more minutes of samples must not accumulate memory")
-        #expect(wallSeconds < 30)
+        #expect(wallSeconds < 90) // about 15 s on CI, under 1 s locally: catches a 10x slowdown, not a busy runner
     }
 
     // MARK: - Capture path

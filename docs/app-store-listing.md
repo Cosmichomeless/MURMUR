@@ -1,6 +1,6 @@
 # App Store listing: localized text
-Draft copy for each language the app ships in. **Not uploaded anywhere**: paste it into App Store Connect (or ask for it to be applied) when the listing is ready. Limits: name 30, subtitle 30, promotional text 170, keywords 100, description 4000 characters.
-The app name stays `MURMUR` in every language.
+Copy for each language the app ships in, as entered in App Store Connect for version 1.0. Limits: name 30, subtitle 30, promotional text 170, keywords 100, description 4000 characters.
+The app name is `MURMUR` in every language except two, where plain `MURMUR` is already taken by another account's app: English (U.S.) is `MURMUR: Voice Recorder` and French is `MURMUR : Dictaphone`.
 
 ## English (U.S.) (`en`)
 
@@ -8,7 +8,7 @@ The app name stays `MURMUR` in every language.
 
 **Promotional text** (118/170): Record voice notes and read them back as text. Transcription runs entirely on your iPhone: your audio never leaves it.
 
-**Keywords** (83/100): voice notes,recorder,dictation,transcribe,memo,audio,speech to text,private,offline
+**Keywords** (86/100): voice notes,voice memos,dictation,transcribe,memo,audio,speech to text,private,offline
 
 **Description**
 
@@ -52,7 +52,7 @@ La transcripción depende de los idiomas que tu iPhone admita para el reconocimi
 
 **Promotional text** (127/170): Enregistrez des notes vocales et relisez-les en texte. La transcription se fait sur votre iPhone : l'audio ne le quitte jamais.
 
-**Keywords** (84/100): notes vocales,dictaphone,dictée,transcrire,mémo,audio,voix en texte,privé,hors ligne
+**Keywords** (86/100): notes vocales,enregistreur,dictée,transcrire,mémo,audio,voix en texte,privé,hors ligne
 
 **Description**
 

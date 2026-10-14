@@ -57,17 +57,17 @@ struct MicrophonePermissionView: View {
 
     private var title: String {
         switch access.permission {
-        case .undetermined: "Microphone access needed"
-        case .granted: "Microphone ready"
-        case .denied: "Microphone access denied"
+        case .undetermined: String(localized: "Microphone access needed")
+        case .granted: String(localized: "Microphone ready")
+        case .denied: String(localized: "Microphone access denied")
         }
     }
 
     private var message: String {
         switch access.permission {
-        case .undetermined: "MURMUR records voice notes with the microphone. Nothing leaves your device."
-        case .granted: "You can record voice notes."
-        case .denied: "Recording is disabled. Allow microphone access for MURMUR in Settings to record."
+        case .undetermined: String(localized: "MURMUR records voice notes with the microphone. Nothing leaves your device.")
+        case .granted: String(localized: "You can record voice notes.")
+        case .denied: String(localized: "Recording is disabled. Allow microphone access for MURMUR in Settings to record.")
         }
     }
 }

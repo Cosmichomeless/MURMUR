@@ -1,0 +1,74 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NSMicrophoneUsageDescription": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR nimmt Ihre Sprachnotizen mit dem Mikrofon auf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR graba tus notas de voz con el micrófono."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR enregistre vos notes vocales avec le microphone."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR registra le tue note vocali con il microfono."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O MURMUR grava as suas notas de voz com o microfone."
+          }
+        }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR wandelt Ihre Sprachnotizen in Text um. Die Transkription läuft mit den Sprachmodellen von Apple auf Ihrem Gerät, und MURMUR lädt Ihr Audio nie hoch."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR convierte tus notas de voz en texto. La transcripción se hace en tu dispositivo con los modelos de voz de Apple y MURMUR nunca sube tu audio."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR transforme vos notes vocales en texte. La transcription s'effectue sur votre appareil avec les modèles vocaux d'Apple, et MURMUR n'envoie jamais votre audio."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MURMUR trasforma le tue note vocali in testo. La trascrizione avviene sul dispositivo con i modelli vocali di Apple e MURMUR non carica mai il tuo audio."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O MURMUR transforma as suas notas de voz em texto. A transcrição é feita no seu dispositivo com os modelos de fala da Apple, e o MURMUR nunca envia o seu áudio."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

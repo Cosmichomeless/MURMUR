@@ -81,7 +81,7 @@ final class RecorderViewModel {
         guard state.isCapturing else { return }
         access.refresh()
         guard access.permission != .granted else { return }
-        keepCapturedAudio(because: "microphone access was turned off")
+        keepCapturedAudio(because: String(localized: "microphone access was turned off"))
     }
 
     /// Stops and saves the recording.
@@ -149,7 +149,7 @@ final class RecorderViewModel {
         case .interruptionBegan:
             pauseForInterruption()
         case .mediaServicesReset:
-            keepCapturedAudio(because: "audio services were reset")
+            keepCapturedAudio(because: String(localized: "audio services were reset"))
         case .interruptionEnded, .routeLost:
             // Resuming a microphone on its own would be a surprise, so the user taps resume.
             // An input lost mid-capture is reported by the recorder as a configuration change.
@@ -162,7 +162,7 @@ final class RecorderViewModel {
         guard state == .recording, let next = state.applying(.pause) else { return }
         recorder.pause()
         state = next
-        notice = "Paused because another app took the microphone. Tap resume to continue."
+        notice = String(localized: "Paused because another app took the microphone. Tap resume to continue.")
     }
 
     private func apply(_ sample: RecorderSample) {
@@ -183,7 +183,7 @@ final class RecorderViewModel {
             try save(audio)
             state = .idle
             elapsed = 0
-            notice = "Recording stopped early (\(reason)). What was captured has been saved."
+            notice = String(localized: "Recording stopped early (\(reason)). What was captured has been saved.")
         } catch {
             state = .failed(error.localizedDescription)
         }

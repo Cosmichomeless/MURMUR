@@ -7,9 +7,9 @@ enum AudioSessionError: Error, Equatable, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .microphoneAccessDenied:
-            "MURMUR needs microphone access to record."
+            String(localized: "MURMUR needs microphone access to record.")
         case .configurationFailed(let reason):
-            "The audio session could not be configured: \(reason)"
+            String(localized: "The audio session could not be configured: \(reason)")
         }
     }
 }
